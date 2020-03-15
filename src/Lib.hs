@@ -184,7 +184,7 @@ getInputs t = i
 --
 -- And the matrix above represents the transitions in the following automata:
 --
---
+-- <<https://github.com/Pablo-Dominguez/my-stack-fsm-package/blob/master/figures/tom.jpg title>>
 
 getAssociations :: Automata -> M.Matrix Int
 getAssociations t = m
