@@ -33,33 +33,12 @@ import qualified Data.List   as L
 import qualified Data.Matrix as M
 import qualified Data.Vector as V
     
-    
-{-   
-type States = Set
-type Inputs = Set
-type Start = Set
-type Delta = M.Matrix
-type Goal = Set
-
-type Automata = (States,Inputs,Start,Delta,Goal)
-type Automata a b d e = A (Set a,Set b,Int,M.Matrix d,Set e)
--}
-
---type no me deja usar Show
 
 -- Create data types -----------------------------------------
 
 data Automata = A (Set Int,Set Char,Int,M.Matrix Int,Set Int)
                 deriving Show
-                
-{-
-showSet :: Set Int -> String
-showSet s =
-    "{"++(L.intersperse ','
-               [head (show (elemAt t s)) | t <- [0..((size s)-1)]])++"}"
-    -}
--- No se me ocurre como implementarlo, pero estaría guay
--- Ej: showSet (fromList [2..5])
+
 
 -- Creating functions -----------------------------------------
 
@@ -97,35 +76,8 @@ createAutomata s i s0 m a
       where s' = fromList [1..s]
             i' = fromList (L.sort i)
             a' = fromList (L.sort a)
-{-
-s: número de estados
-i: lista del lenguaje
-s0: estado inicial
-m: matriz de asociaciones, filas == estados, columnas ==  inputs
-a: subconjunto de estados de aceptación (lista)
-
-matriz = M.fromLists [[2,0,0,0],[2,1,4,0],[1,4,0,0],[0,0,0,3]]
-createAutomata 4 ['a', 'b', 'c', 'd'] 1 matriz [4]
 
 
--}
-            
-            
--- Nota: los he ordenado porque me va a hacer falta a la hora de usar
--- validInput en la matriz (getIndex)
--- Nota : He reemplazado creaAutomata :: [Int] por creaAutomata :: Int,
--- para que sólo haya que dar el número de estados (y se numeren de forma
--- automática)
--- Nota : not (isSubsetOf (insert 0 (fromList (M.toList m))) (insert 0 s'))
--- Ej: creaAutomata [1..3] "abc" 2 (M.fromList 3 3 [1,2,3,1,2,3,1,2,3]) [1]
-                 
--- Funciones de acceso
-
-{-  Alternativa:
-
-get_ (A (s,i,s0,m,a)) = s
- 
- -}
 
 -- Accessing functions ----------------------------------------- 
  
@@ -146,9 +98,9 @@ getInitialState :: Automata -> Int
 getInitialState t = s0
     where A (s,i,s0,m,a) = t 
 
--- | This function returns the current initial state of the automata.    
-getInputs :: Automata -> Set Char 
-getInputs t = i
+-- | This function returns the string of inputs that the automata accepts.    
+getInputs :: Automata -> String
+getInputs t = toList i
     where A (s,i,s0,m,a) = t 
           
 -- | This function returns the associations matrix of the automata.  This matrix is built according to the following rules:
@@ -163,6 +115,22 @@ getInputs t = i
 -- > tom = createAutomata 4 ['a', 'b', 'c', 'd'] 1 mat [4]
 --
 -- The code above represent this matrix: 
+--
+-- >     'a' 'b' 'c' 'd'         <= inputs
+-- >   ------------------
+-- > 1 |  2   0   0   0 
+-- > 2 |  2   1   4   0  
+-- > 3 |  1   4   0   0 
+-- > 4 |  0   0   0   3  
+-- > 
+-- > ^
+-- > |
+-- > states
+-- 
+-- And the matrix above represents the transitions in the following automata:
+--
+-- <<https://i.imgur.com/ymWLlsb.png Tom automata figure>>
+{-
 --
 -- +-----------+------------+----------+----------+----------+
 -- |           | 'a'        | 'b'      | 'c'      | 'd'      |  
@@ -182,15 +150,15 @@ getInputs t = i
 -- |           |    \]                                       |
 -- +-----------+------------+----------+----------+----------+
 --
--- And the matrix above represents the transitions in the following automata:
---
--- <<https://github.com/Pablo-Dominguez/my-stack-fsm-package/blob/master/figures/tom.jpg title>>
+-}
 
 getAssociations :: Automata -> M.Matrix Int
 getAssociations t = m
     where A (s,i,s0,m,a) = t
          
-getTransitions :: Automata -> Int -> Set Char
+-- | This function returns the inputs that a state accepts for transitioning into another state.
+--
+getTransitions :: Automata -> Int -> [Char]
 getTransitions t k 
     | not (member k s) = error "Not a valid state"
     | otherwise = l
@@ -198,9 +166,9 @@ getTransitions t k
           i = getInputs t
           s = getStates t
           row = V.toList (M.getRow k m)
-          l = fromList [ a | (a,k) <- zip (toList i) row, k /= 0]
+          l = [ a | (a,k) <- zip i row, k /= 0]
 
-    
+-- | This function returns those states of the automata that do not have any input to any other state, i.e., once that a 'hole' state is reached, none of the rest of state can be reached anymore for the current execution.
 getHoles :: Automata -> Set Int
 getHoles t = fromList hs
     where A (s,i,s0,m,a) = t 
@@ -208,30 +176,11 @@ getHoles t = fromList hs
                 and [n == (M.getRow n m)V.!k || (M.getRow n m)V.!k == 0 | k <- [0..((size i)-1)]]]
          
 -- getHoles devuelve los estados de los que no parte ninguna arista, i.e. aquellos en los que la matriz tiene en su fila todos los elementos iguales al índice de la fila o nulos
--- revisar
+
                
--- Quiero añadir una pequeña descripción con instrucciónes sobre
--- la librería al principio, y que haciendo help o algo así se pueda leer
- 
--- nota: las columnas de la 'matriz de adyacencia' (posibles inputs)
--- deben estar en orden lexicográfico (ver L.sort)
-{-
-
-Ej: 4 posibles imputs, 3 estados:
-
-        | '1' | '3' | 'i' | 'j'      <- inputs
-        -------------------------
-      1 |  0  |  2  |  3  |  0
-      2 |  1  |  0  |  0  |  3       <- si uso la forma de la matriz 
-      3 |  1  |  1  |  0  |  2          "con ceros", no puede haber n 
-                                        en la fila n-esima
-      ^
-      |
-     estados
 
  
--}
---Input checking
+
 
 -- Checking functions -----------------------------------------
 
@@ -242,10 +191,10 @@ validInputAux str a k
     | elem k h && not (member k ac) = False
     | L.null str && member k ac = True
     | L.null str && not (member k ac) = False
-    | not (member st (getTransitions a k)) =  error ("Not valid input "  ++ (show st) ++ " for state " ++ (show k) )
+    | not (member st (fromList (getTransitions a k))) =  error ("Not valid input "  ++ (show st) ++ " for state " ++ (show k) )
     | otherwise = validInputAux (tail str) a k'
     where s = getStates a
-          i = getInputs a
+          i = fromList (getInputs a)
           s0 = getInitialState a
           m = getAssociations a
           ac = fromList (getAcceptingStates a)
@@ -253,41 +202,33 @@ validInputAux str a k
           st = head str
           k' = M.getElem k ((findIndex st i)+1) m
          
-         
--- Duda: debería incluir los estados, la matriz y to eso como argumentos
--- para ahorrar memoria, o no influye mucho? (está haciendo el where y
--- llamando a las funciones get por cada iteración)
 
+
+
+-- | This function test if a string is @/valid/@, i.e., if when the automata receives the string, ends in one of the accepting states.
 validInput :: String -> Automata -> Bool
 validInput str a = validInputAux str a s0
     where s0 = getInitialState a
 
--- valid input "baac" tomatito falla
-
--- OPCIONES: o en la matriz hay 0 y en cada fila n no aparece el mismo n,
--- o bien no hay ceros y si puede aparecer el propio n 
-
-
--- 2 Dudas (modelizar la matriz 
 
 -- Editing functions -----------------------------------------
 
 
--- Function for adding a state to an Automata from the list of
--- associations
+-- | Function for adding a state to an Automata with the list of associations to the other states. If you would want to add a non-connected state, simply enter the list [0,..,0], with as many zeros as possible inputs.
 addState :: Automata -> [Int] -> Automata
 addState a ls 
-    | L.length ls /= size (getInputs a) = error ( "Not a valid list of associations" ) 
+    | L.length ls /= L.length (getInputs a) = error ( "Not a valid list of associations" ) 
     | otherwise = createAutomata s i s0 m t
     where s = (M.nrows (getAssociations a)) +1
-          i = toList (getInputs a)
+          i = getInputs a
           s0 = getInitialState a
           t = getAcceptingStates a
           m = M.fromLists ((M.toLists (getAssociations a))++[ls])
 
 dropElemAtIndex :: Int -> [[Int]] -> [[Int]]
 dropElemAtIndex i ls = L.take (i-1) ls ++ L.drop i ls
-          
+
+-- | This function deletes a state and all the connections it has with any other state. Please note that this function automatically reassigns new numbers for the remaining states, so the states and the associations matrix change accordingly. E.g. if you delete in the previous automata the 3rd state, then since the new automata has just 3 states, the old 4th state becomes the new 3rd state.
 deleteState :: Automata -> Int ->Automata
 deleteState a i 
     | not (elem i (getStates a)) = error ( "This state is not one of the states of the automata." )
@@ -295,7 +236,7 @@ deleteState a i
     | elem i (fromList (getAcceptingStates a)) && L.length (getAcceptingStates a) == 1 = error ("You are trying to delete the only accepting state.")
     | otherwise = createAutomata s i' s0' m t
     where s = (M.nrows (getAssociations a)) -1
-          i' = toList (getInputs a)
+          i' = getInputs a
           s0 = getInitialState a
           s0' = if s0 < i then s0 else s0-1
           t = [if l < i then l else l-1 | l <- toList ((fromList (getAcceptingStates a)) `difference` singleton i)]
@@ -307,6 +248,7 @@ deleteState a i
                                                    else 0 | l <- ls] | ls <- rows])
           m = M.fromLists rows_deleted
 
+-- | This function changes the initial state.
 changeInitialState :: Automata -> Int -> Automata
 changeInitialState t s0' 
     | not (elem s0' (getStates t)) = error ( "This state is not one of the states of the automata." )
@@ -314,10 +256,11 @@ changeInitialState t s0'
     | otherwise = createAutomata s' i' s0' m a
         where a = getAcceptingStates t 
               s' = size (getStates t)
-              i' = toList (getInputs t)
+              i' = getInputs t
               m = getAssociations t
 
 
+-- | This function adds one accepting state
 addAcceptingState :: Automata -> Int -> Automata
 addAcceptingState t a0
     | not (elem a0 (getStates t)) = error ( "This state is not one of the states of the automata." )
@@ -326,7 +269,7 @@ addAcceptingState t a0
     where a = getAcceptingStates t 
           a' = a ++ [a0]
           s' = size (getStates t)
-          i' = toList (getInputs t)
+          i' = getInputs t
           m = getAssociations t
           s0 = getInitialState t
           
