@@ -2,12 +2,14 @@
 -- See Hoogle, http://www.haskell.org/hoogle/
 
 
--- | Please see the README on GitHub at
+-- | Basic concepts ouf finite state machines.
+--   
+--   Please see the README on GitHub at
 --   <a>https://github.com/Pablo-Dominguez/my-stack-fsm-package#readme</a>
-@package my-fsm-stack-package
-@version 0.0.1.0
+@package FSM
+@version 0.0.2.0
 
-module Lib
+module Automata
 data Automata
 
 -- | This is the main function for creating the Automata abstract data
@@ -132,4 +134,4 @@ changeInitialState :: Automata -> Int -> Automata
 
 -- | This function adds one accepting state
 addAcceptingState :: Automata -> Int -> Automata
-instance GHC.Show.Show Lib.Automata
+instance GHC.Show.Show Automata.Automata

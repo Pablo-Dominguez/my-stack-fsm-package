@@ -1,29 +1,29 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span>
 </span><span id="line-2"></span><span class="hs-comment">-- Import packages -----------------------------------------</span><span>
 </span><span id="line-3"></span><span>
-</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Lib</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Automata</span><span> </span><span class="hs-special">(</span><span>
 </span><span id="line-5"></span><span>
-</span><span id="line-6"></span><span>    </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier">Automata</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-6"></span><span>    </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier">Automata</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-7"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Creating functions</span></span><span>
-</span><span id="line-8"></span><span>    </span><span class="annot"><a href="Lib.html#createAutomata"><span class="hs-identifier">createAutomata</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-8"></span><span>    </span><span class="annot"><a href="Automata.html#createAutomata"><span class="hs-identifier">createAutomata</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-9"></span><span>    </span><span>
 </span><span id="line-10"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Accesing functions</span></span><span>
-</span><span id="line-11"></span><span>    </span><span class="annot"><a href="Lib.html#getStates"><span class="hs-identifier">getStates</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-12"></span><span>    </span><span class="annot"><a href="Lib.html#getAcceptingStates"><span class="hs-identifier">getAcceptingStates</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Lib.html#getInitialState"><span class="hs-identifier">getInitialState</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Lib.html#getInputs"><span class="hs-identifier">getInputs</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Lib.html#getAssociations"><span class="hs-identifier">getAssociations</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Lib.html#getTransitions"><span class="hs-identifier">getTransitions</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Lib.html#getHoles"><span class="hs-identifier">getHoles</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>    </span><span class="annot"><a href="Automata.html#getStates"><span class="hs-identifier">getStates</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-12"></span><span>    </span><span class="annot"><a href="Automata.html#getAcceptingStates"><span class="hs-identifier">getAcceptingStates</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Automata.html#getInitialState"><span class="hs-identifier">getInitialState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Automata.html#getInputs"><span class="hs-identifier">getInputs</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Automata.html#getAssociations"><span class="hs-identifier">getAssociations</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Automata.html#getTransitions"><span class="hs-identifier">getTransitions</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Automata.html#getHoles"><span class="hs-identifier">getHoles</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-18"></span><span>    </span><span>
 </span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Checking functions</span></span><span>
-</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Lib.html#validInput"><span class="hs-identifier">validInput</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Automata.html#validInput"><span class="hs-identifier">validInput</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-21"></span><span>    </span><span>
 </span><span id="line-22"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Editing functions</span></span><span>
-</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Lib.html#addState"><span class="hs-identifier">addState</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Lib.html#deleteState"><span class="hs-identifier">deleteState</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Lib.html#changeInitialState"><span class="hs-identifier">changeInitialState</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-26"></span><span>    </span><span class="annot"><a href="Lib.html#addAcceptingState"><span class="hs-identifier">addAcceptingState</span></a></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Automata.html#addState"><span class="hs-identifier">addState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Automata.html#deleteState"><span class="hs-identifier">deleteState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Automata.html#changeInitialState"><span class="hs-identifier">changeInitialState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><a href="Automata.html#addAcceptingState"><span class="hs-identifier">addAcceptingState</span></a></span><span>
 </span><span id="line-27"></span><span>     </span><span>
 </span><span id="line-28"></span><span>
 </span><span id="line-29"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
@@ -36,7 +36,7 @@
 </span><span id="line-36"></span><span>
 </span><span id="line-37"></span><span class="hs-comment">-- Create data types -----------------------------------------</span><span>
 </span><span id="line-38"></span><span>
-</span><span id="line-39"></span><span class="hs-keyword">data</span><span> </span><span id="Automata"><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-var">Automata</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="A"><span class="annot"><a href="Lib.html#A"><span class="hs-identifier hs-var">A</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">M.Matrix</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">data</span><span> </span><span id="Automata"><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-var">Automata</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="A"><span class="annot"><a href="Automata.html#A"><span class="hs-identifier hs-var">A</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">M.Matrix</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
 </span><span id="line-40"></span><span>                </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679057718"><span id="local-6989586621679057720"><span id="local-6989586621679057722"><span class="annot"><span class="annottext">Int -&gt; Automata -&gt; ShowS
 [Automata] -&gt; ShowS
 Automata -&gt; String
@@ -75,9 +75,9 @@ $cshowsPrec :: Int -&gt; Automata -&gt; ShowS
 </span><span id="line-62"></span><span class="hs-comment">-- &gt; tom = createAutomata 4 ['a', 'b', 'c', 'd'] 1 mat [4]</span><span>
 </span><span id="line-63"></span><span>
 </span><span id="line-64"></span><span>
-</span><span id="line-65"></span><span class="annot"><a href="Lib.html#createAutomata"><span class="hs-identifier hs-type">createAutomata</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">M.Matrix</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
+</span><span id="line-65"></span><span class="annot"><a href="Automata.html#createAutomata"><span class="hs-identifier hs-type">createAutomata</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">M.Matrix</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
 </span><span id="line-66"></span><span id="createAutomata"><span class="annot"><span class="annottext">createAutomata :: Int -&gt; String -&gt; Int -&gt; Matrix Int -&gt; [Int] -&gt; Automata
-</span><a href="Lib.html#createAutomata"><span class="hs-identifier hs-var hs-var">createAutomata</span></a></span></span><span> </span><span id="local-6989586621679057716"><span class="annot"><span class="annottext">s :: Int
+</span><a href="Automata.html#createAutomata"><span class="hs-identifier hs-var hs-var">createAutomata</span></a></span></span><span> </span><span id="local-6989586621679057716"><span class="annot"><span class="annottext">s :: Int
 </span><a href="#local-6989586621679057716"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679057715"><span class="annot"><span class="annottext">i :: String
 </span><a href="#local-6989586621679057715"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span id="local-6989586621679057714"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057714"><span class="hs-identifier hs-var">s0</span></a></span></span><span> </span><span id="local-6989586621679057713"><span class="annot"><span class="annottext">m :: Matrix Int
@@ -137,7 +137,7 @@ forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="hs-string">&quot;Not valid accepting states&quot;</span></span><span>
 </span><span id="line-75"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Set Int, Set Char, Int, Matrix Int, Set Int) -&gt; Automata
-</span><a href="Lib.html#A"><span class="hs-identifier hs-var">A</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Int
+</span><a href="Automata.html#A"><span class="hs-identifier hs-var">A</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Int
 </span><a href="#local-6989586621679057709"><span class="hs-identifier hs-var">s'</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Set Char
 </span><a href="#local-6989586621679057704"><span class="hs-identifier hs-var">i'</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057714"><span class="hs-identifier hs-var">s0</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Matrix Int
@@ -169,12 +169,12 @@ forall a. Ord a =&gt; [a] -&gt; [a]
 </span><span id="line-83"></span><span> </span><span>
 </span><span id="line-84"></span><span> </span><span>
 </span><span id="line-85"></span><span class="hs-comment">-- | This function returns the set of states of the automata. It is really of not much use since the generation of the automata only needs the number of states and not the whole set of them, but just in case you want to check which states does the current automata have. </span><span>
-</span><span id="line-86"></span><span class="annot"><a href="Lib.html#getStates"><span class="hs-identifier hs-type">getStates</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Automata.html#getStates"><span class="hs-identifier hs-type">getStates</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span>
 </span><span id="line-87"></span><span id="getStates"><span class="annot"><span class="annottext">getStates :: Automata -&gt; Set Int
-</span><a href="Lib.html#getStates"><span class="hs-identifier hs-var hs-var">getStates</span></a></span></span><span> </span><span id="local-6989586621679057697"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#getStates"><span class="hs-identifier hs-var hs-var">getStates</span></a></span></span><span> </span><span id="local-6989586621679057697"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057697"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Int
 </span><a href="#local-6989586621679057696"><span class="hs-identifier hs-var">s</span></a></span><span>
-</span><span id="line-88"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Lib.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057696"><span class="annot"><span class="annottext">s :: Set Int
+</span><span id="line-88"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Automata.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057696"><span class="annot"><span class="annottext">s :: Set Int
 </span><a href="#local-6989586621679057696"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057695"><span class="annot"><span class="annottext">i :: Set Char
 </span><a href="#local-6989586621679057695"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057694"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057694"><span class="hs-identifier hs-var">s0</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057693"><span class="annot"><span class="annottext">m :: Matrix Int
@@ -183,12 +183,12 @@ forall a. Ord a =&gt; [a] -&gt; [a]
 </span><a href="#local-6989586621679057697"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-89"></span><span>
 </span><span id="line-90"></span><span class="hs-comment">-- | This function returns the list of accepting states of the automata. It is a list and not a set for coherence purpouses. When you build the automata you have to give a list of accepting states so I though it made sense to also return a list of accepting states as the accessing function.</span><span>
-</span><span id="line-91"></span><span class="annot"><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-type">getAcceptingStates</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span>
+</span><span id="line-91"></span><span class="annot"><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-type">getAcceptingStates</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span>
 </span><span id="line-92"></span><span id="getAcceptingStates"><span class="annot"><span class="annottext">getAcceptingStates :: Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var hs-var">getAcceptingStates</span></a></span></span><span> </span><span id="local-6989586621679057691"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var hs-var">getAcceptingStates</span></a></span></span><span> </span><span id="local-6989586621679057691"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057691"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int]
 </span><a href="#local-6989586621679057690"><span class="hs-identifier hs-var">a'</span></a></span><span>
-</span><span id="line-93"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Lib.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057689"><span class="annot"><span class="annottext">s :: Set Int
+</span><span id="line-93"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Automata.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057689"><span class="annot"><span class="annottext">s :: Set Int
 </span><a href="#local-6989586621679057689"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057688"><span class="annot"><span class="annottext">i :: Set Char
 </span><a href="#local-6989586621679057688"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057687"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057687"><span class="hs-identifier hs-var">s0</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057686"><span class="annot"><span class="annottext">m :: Matrix Int
@@ -202,12 +202,12 @@ forall a. Set a -&gt; [a]
 </span><a href="#local-6989586621679057685"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-95"></span><span>
 </span><span id="line-96"></span><span class="hs-comment">-- | This function returns the current initial state of the automata.</span><span>
-</span><span id="line-97"></span><span class="annot"><a href="Lib.html#getInitialState"><span class="hs-identifier hs-type">getInitialState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span>
+</span><span id="line-97"></span><span class="annot"><a href="Automata.html#getInitialState"><span class="hs-identifier hs-type">getInitialState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span>
 </span><span id="line-98"></span><span id="getInitialState"><span class="annot"><span class="annottext">getInitialState :: Automata -&gt; Int
-</span><a href="Lib.html#getInitialState"><span class="hs-identifier hs-var hs-var">getInitialState</span></a></span></span><span> </span><span id="local-6989586621679057683"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#getInitialState"><span class="hs-identifier hs-var hs-var">getInitialState</span></a></span></span><span> </span><span id="local-6989586621679057683"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057683"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057682"><span class="hs-identifier hs-var">s0</span></a></span><span>
-</span><span id="line-99"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Lib.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057681"><span class="annot"><span class="annottext">s :: Set Int
+</span><span id="line-99"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Automata.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057681"><span class="annot"><span class="annottext">s :: Set Int
 </span><a href="#local-6989586621679057681"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057680"><span class="annot"><span class="annottext">i :: Set Char
 </span><a href="#local-6989586621679057680"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057682"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057682"><span class="hs-identifier hs-var">s0</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057679"><span class="annot"><span class="annottext">m :: Matrix Int
@@ -216,14 +216,14 @@ forall a. Set a -&gt; [a]
 </span><a href="#local-6989586621679057683"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span>
 </span><span id="line-100"></span><span>
 </span><span id="line-101"></span><span class="hs-comment">-- | This function returns the string of inputs that the automata accepts.    </span><span>
-</span><span id="line-102"></span><span class="annot"><a href="Lib.html#getInputs"><span class="hs-identifier hs-type">getInputs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-102"></span><span class="annot"><a href="Automata.html#getInputs"><span class="hs-identifier hs-type">getInputs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
 </span><span id="line-103"></span><span id="getInputs"><span class="annot"><span class="annottext">getInputs :: Automata -&gt; String
-</span><a href="Lib.html#getInputs"><span class="hs-identifier hs-var hs-var">getInputs</span></a></span></span><span> </span><span id="local-6989586621679057677"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#getInputs"><span class="hs-identifier hs-var hs-var">getInputs</span></a></span></span><span> </span><span id="local-6989586621679057677"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057677"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Char -&gt; String
 forall a. Set a -&gt; [a]
 </span><span class="hs-identifier hs-var">toList</span></span><span> </span><span class="annot"><span class="annottext">Set Char
 </span><a href="#local-6989586621679057676"><span class="hs-identifier hs-var">i</span></a></span><span>
-</span><span id="line-104"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Lib.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057675"><span class="annot"><span class="annottext">s :: Set Int
+</span><span id="line-104"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Automata.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057675"><span class="annot"><span class="annottext">s :: Set Int
 </span><a href="#local-6989586621679057675"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057676"><span class="annot"><span class="annottext">i :: Set Char
 </span><a href="#local-6989586621679057676"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057674"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057674"><span class="hs-identifier hs-var">s0</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057673"><span class="annot"><span class="annottext">m :: Matrix Int
@@ -280,12 +280,12 @@ forall a. Set a -&gt; [a]
 --
 -}</span><span>
 </span><span id="line-154"></span><span>
-</span><span id="line-155"></span><span class="annot"><a href="Lib.html#getAssociations"><span class="hs-identifier hs-type">getAssociations</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">M.Matrix</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-155"></span><span class="annot"><a href="Automata.html#getAssociations"><span class="hs-identifier hs-type">getAssociations</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">M.Matrix</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
 </span><span id="line-156"></span><span id="getAssociations"><span class="annot"><span class="annottext">getAssociations :: Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var hs-var">getAssociations</span></a></span></span><span> </span><span id="local-6989586621679057671"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var hs-var">getAssociations</span></a></span></span><span> </span><span id="local-6989586621679057671"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057671"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Matrix Int
 </span><a href="#local-6989586621679057670"><span class="hs-identifier hs-var">m</span></a></span><span>
-</span><span id="line-157"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Lib.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057669"><span class="annot"><span class="annottext">s :: Set Int
+</span><span id="line-157"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Automata.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057669"><span class="annot"><span class="annottext">s :: Set Int
 </span><a href="#local-6989586621679057669"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057668"><span class="annot"><span class="annottext">i :: Set Char
 </span><a href="#local-6989586621679057668"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057667"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057667"><span class="hs-identifier hs-var">s0</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057670"><span class="annot"><span class="annottext">m :: Matrix Int
@@ -295,9 +295,9 @@ forall a. Set a -&gt; [a]
 </span><span id="line-158"></span><span>         </span><span>
 </span><span id="line-159"></span><span class="hs-comment">-- | This function returns the inputs that a state accepts for transitioning into another state.</span><span>
 </span><span id="line-160"></span><span class="hs-comment">--</span><span>
-</span><span id="line-161"></span><span class="annot"><a href="Lib.html#getTransitions"><span class="hs-identifier hs-type">getTransitions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">]</span><span>
+</span><span id="line-161"></span><span class="annot"><a href="Automata.html#getTransitions"><span class="hs-identifier hs-type">getTransitions</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">]</span><span>
 </span><span id="line-162"></span><span id="getTransitions"><span class="annot"><span class="annottext">getTransitions :: Automata -&gt; Int -&gt; String
-</span><a href="Lib.html#getTransitions"><span class="hs-identifier hs-var hs-var">getTransitions</span></a></span></span><span> </span><span id="local-6989586621679057665"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#getTransitions"><span class="hs-identifier hs-var hs-var">getTransitions</span></a></span></span><span> </span><span id="local-6989586621679057665"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057665"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679057664"><span class="annot"><span class="annottext">k :: Int
 </span><a href="#local-6989586621679057664"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span>
 </span><span id="line-163"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
@@ -313,15 +313,15 @@ forall a. HasCallStack =&gt; String -&gt; a
 </span><a href="#local-6989586621679057662"><span class="hs-identifier hs-var">l</span></a></span><span>
 </span><span id="line-165"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679057661"><span class="annot"><span class="annottext">m :: Matrix Int
 </span><a href="#local-6989586621679057661"><span class="hs-identifier hs-var hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057665"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-166"></span><span>          </span><span id="local-6989586621679057660"><span class="annot"><span class="annottext">i :: String
 </span><a href="#local-6989586621679057660"><span class="hs-identifier hs-var hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; String
-</span><a href="Lib.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057665"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-167"></span><span>          </span><span id="local-6989586621679057663"><span class="annot"><span class="annottext">s :: Set Int
 </span><a href="#local-6989586621679057663"><span class="hs-identifier hs-var hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Set Int
-</span><a href="Lib.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057665"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-168"></span><span>          </span><span id="local-6989586621679057659"><span class="annot"><span class="annottext">row :: [Int]
 </span><a href="#local-6989586621679057659"><span class="hs-identifier hs-var hs-var">row</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Vector Int -&gt; [Int]
@@ -345,14 +345,14 @@ forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span class="hs-special">]</span><span>
 </span><span id="line-170"></span><span>
 </span><span id="line-171"></span><span class="hs-comment">-- | This function returns those states of the automata that do not have any input to any other state, i.e., once that a 'hole' state is reached, none of the rest of state can be reached anymore for the current execution.</span><span>
-</span><span id="line-172"></span><span class="annot"><a href="Lib.html#getHoles"><span class="hs-identifier hs-type">getHoles</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-172"></span><span class="annot"><a href="Automata.html#getHoles"><span class="hs-identifier hs-type">getHoles</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
 </span><span id="line-173"></span><span id="getHoles"><span class="annot"><span class="annottext">getHoles :: Automata -&gt; Set Int
-</span><a href="Lib.html#getHoles"><span class="hs-identifier hs-var hs-var">getHoles</span></a></span></span><span> </span><span id="local-6989586621679057653"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#getHoles"><span class="hs-identifier hs-var hs-var">getHoles</span></a></span></span><span> </span><span id="local-6989586621679057653"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057653"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Set Int
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="annot"><span class="annottext">[Int]
 </span><a href="#local-6989586621679057652"><span class="hs-identifier hs-var">hs</span></a></span><span>
-</span><span id="line-174"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Lib.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057651"><span class="annot"><span class="annottext">s :: Set Int
+</span><span id="line-174"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="Automata.html#A"><span class="hs-identifier hs-type">A</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679057651"><span class="annot"><span class="annottext">s :: Set Int
 </span><a href="#local-6989586621679057651"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057650"><span class="annot"><span class="annottext">i :: Set Char
 </span><a href="#local-6989586621679057650"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057649"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057649"><span class="hs-identifier hs-var">s0</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679057648"><span class="annot"><span class="annottext">m :: Matrix Int
@@ -405,9 +405,9 @@ forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span id="line-184"></span><span>
 </span><span id="line-185"></span><span class="hs-comment">-- Checking functions -----------------------------------------</span><span>
 </span><span id="line-186"></span><span>
-</span><span id="line-187"></span><span class="annot"><a href="Lib.html#validInputAux"><span class="hs-identifier hs-type">validInputAux</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-187"></span><span class="annot"><a href="Automata.html#validInputAux"><span class="hs-identifier hs-type">validInputAux</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
 </span><span id="line-188"></span><span id="validInputAux"><span class="annot"><span class="annottext">validInputAux :: String -&gt; Automata -&gt; Int -&gt; Bool
-</span><a href="Lib.html#validInputAux"><span class="hs-identifier hs-var hs-var">validInputAux</span></a></span></span><span> </span><span id="local-6989586621679057640"><span class="annot"><span class="annottext">str :: String
+</span><a href="Automata.html#validInputAux"><span class="hs-identifier hs-var hs-var">validInputAux</span></a></span></span><span> </span><span id="local-6989586621679057640"><span class="annot"><span class="annottext">str :: String
 </span><a href="#local-6989586621679057640"><span class="hs-identifier hs-var">str</span></a></span></span><span> </span><span id="local-6989586621679057639"><span class="annot"><span class="annottext">a :: Automata
 </span><a href="#local-6989586621679057639"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679057638"><span class="annot"><span class="annottext">k :: Int
 </span><a href="#local-6989586621679057638"><span class="hs-identifier hs-var">k</span></a></span></span><span>
@@ -472,7 +472,7 @@ forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
 </span><a href="#local-6989586621679057631"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Set Char
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Int -&gt; String
-</span><a href="Lib.html#getTransitions"><span class="hs-identifier hs-var">getTransitions</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getTransitions"><span class="hs-identifier hs-var">getTransitions</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057639"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057638"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">String -&gt; Bool
 forall a. HasCallStack =&gt; String -&gt; a
@@ -491,7 +491,7 @@ forall a. Show a =&gt; a -&gt; String
 </span><a href="#local-6989586621679057638"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">)</span><span>
 </span><span id="line-195"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Automata -&gt; Int -&gt; Bool
-</span><a href="Lib.html#validInputAux"><span class="hs-identifier hs-var">validInputAux</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ShowS
+</span><a href="Automata.html#validInputAux"><span class="hs-identifier hs-var">validInputAux</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ShowS
 forall a. [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">tail</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><a href="#local-6989586621679057640"><span class="hs-identifier hs-var">str</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Automata
@@ -499,31 +499,31 @@ forall a. [a] -&gt; [a]
 </span><a href="#local-6989586621679057628"><span class="hs-identifier hs-var">k'</span></a></span><span>
 </span><span id="line-196"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679057627"><span class="annot"><span class="annottext">s :: Set Int
 </span><a href="#local-6989586621679057627"><span class="hs-identifier hs-var hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Set Int
-</span><a href="Lib.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057639"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-197"></span><span>          </span><span id="local-6989586621679057637"><span class="annot"><span class="annottext">i :: Set Char
 </span><a href="#local-6989586621679057637"><span class="hs-identifier hs-var hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Set Char
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; String
-</span><a href="Lib.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057639"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-198"></span><span>          </span><span id="local-6989586621679057626"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057626"><span class="hs-identifier hs-var hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Int
-</span><a href="Lib.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057639"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-199"></span><span>          </span><span id="local-6989586621679057625"><span class="annot"><span class="annottext">m :: Matrix Int
 </span><a href="#local-6989586621679057625"><span class="hs-identifier hs-var hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057639"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-200"></span><span>          </span><span id="local-6989586621679057633"><span class="annot"><span class="annottext">ac :: Set Int
 </span><a href="#local-6989586621679057633"><span class="hs-identifier hs-var hs-var">ac</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Set Int
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057639"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-201"></span><span>          </span><span id="local-6989586621679057635"><span class="annot"><span class="annottext">h :: Set Int
 </span><a href="#local-6989586621679057635"><span class="hs-identifier hs-var hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Set Int
-</span><a href="Lib.html#getHoles"><span class="hs-identifier hs-var">getHoles</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getHoles"><span class="hs-identifier hs-var">getHoles</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057639"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-202"></span><span>          </span><span id="local-6989586621679057631"><span class="annot"><span class="annottext">st :: Char
 </span><a href="#local-6989586621679057631"><span class="hs-identifier hs-var hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Char
@@ -547,18 +547,18 @@ forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span id="line-206"></span><span>
 </span><span id="line-207"></span><span>
 </span><span id="line-208"></span><span class="hs-comment">-- | This function test if a string is @/valid/@, i.e., if when the automata receives the string, ends in one of the accepting states.</span><span>
-</span><span id="line-209"></span><span class="annot"><a href="Lib.html#validInput"><span class="hs-identifier hs-type">validInput</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-209"></span><span class="annot"><a href="Automata.html#validInput"><span class="hs-identifier hs-type">validInput</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
 </span><span id="line-210"></span><span id="validInput"><span class="annot"><span class="annottext">validInput :: String -&gt; Automata -&gt; Bool
-</span><a href="Lib.html#validInput"><span class="hs-identifier hs-var hs-var">validInput</span></a></span></span><span> </span><span id="local-6989586621679057620"><span class="annot"><span class="annottext">str :: String
+</span><a href="Automata.html#validInput"><span class="hs-identifier hs-var hs-var">validInput</span></a></span></span><span> </span><span id="local-6989586621679057620"><span class="annot"><span class="annottext">str :: String
 </span><a href="#local-6989586621679057620"><span class="hs-identifier hs-var">str</span></a></span></span><span> </span><span id="local-6989586621679057619"><span class="annot"><span class="annottext">a :: Automata
 </span><a href="#local-6989586621679057619"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Automata -&gt; Int -&gt; Bool
-</span><a href="Lib.html#validInputAux"><span class="hs-identifier hs-var">validInputAux</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="Automata.html#validInputAux"><span class="hs-identifier hs-var">validInputAux</span></a></span><span> </span><span class="annot"><span class="annottext">String
 </span><a href="#local-6989586621679057620"><span class="hs-identifier hs-var">str</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057619"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057618"><span class="hs-identifier hs-var">s0</span></a></span><span>
 </span><span id="line-211"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679057618"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057618"><span class="hs-identifier hs-var hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Int
-</span><a href="Lib.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057619"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-212"></span><span>
 </span><span id="line-213"></span><span>
@@ -566,9 +566,9 @@ forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span id="line-215"></span><span>
 </span><span id="line-216"></span><span>
 </span><span id="line-217"></span><span class="hs-comment">-- | Function for adding a state to an Automata with the list of associations to the other states. If you would want to add a non-connected state, simply enter the list [0,..,0], with as many zeros as possible inputs.</span><span>
-</span><span id="line-218"></span><span class="annot"><a href="Lib.html#addState"><span class="hs-identifier hs-type">addState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
+</span><span id="line-218"></span><span class="annot"><a href="Automata.html#addState"><span class="hs-identifier hs-type">addState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
 </span><span id="line-219"></span><span id="addState"><span class="annot"><span class="annottext">addState :: Automata -&gt; [Int] -&gt; Automata
-</span><a href="Lib.html#addState"><span class="hs-identifier hs-var hs-var">addState</span></a></span></span><span> </span><span id="local-6989586621679057617"><span class="annot"><span class="annottext">a :: Automata
+</span><a href="Automata.html#addState"><span class="hs-identifier hs-var hs-var">addState</span></a></span></span><span> </span><span id="local-6989586621679057617"><span class="annot"><span class="annottext">a :: Automata
 </span><a href="#local-6989586621679057617"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679057616"><span class="annot"><span class="annottext">ls :: [Int]
 </span><a href="#local-6989586621679057616"><span class="hs-identifier hs-var">ls</span></a></span></span><span> </span><span>
 </span><span id="line-220"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
@@ -579,13 +579,13 @@ forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Int
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
 </span><span class="hs-identifier hs-var">L.length</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; String
-</span><a href="Lib.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057617"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Automata
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-string">&quot;Not a valid list of associations&quot;</span></span><span> </span><span class="hs-special">)</span><span> </span><span>
 </span><span id="line-221"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String -&gt; Int -&gt; Matrix Int -&gt; [Int] -&gt; Automata
-</span><a href="Lib.html#createAutomata"><span class="hs-identifier hs-var">createAutomata</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Automata.html#createAutomata"><span class="hs-identifier hs-var">createAutomata</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057614"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">String
 </span><a href="#local-6989586621679057613"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057612"><span class="hs-identifier hs-var">s0</span></a></span><span> </span><span class="annot"><span class="annottext">Matrix Int
@@ -595,21 +595,21 @@ forall a. HasCallStack =&gt; String -&gt; a
 </span><a href="#local-6989586621679057614"><span class="hs-identifier hs-var hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Matrix Int -&gt; Int
 forall a. Matrix a -&gt; Int
 </span><span class="hs-identifier hs-var hs-var">M.nrows</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057617"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="hs-number">1</span></span><span>
 </span><span id="line-223"></span><span>          </span><span id="local-6989586621679057613"><span class="annot"><span class="annottext">i :: String
 </span><a href="#local-6989586621679057613"><span class="hs-identifier hs-var hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; String
-</span><a href="Lib.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057617"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-224"></span><span>          </span><span id="local-6989586621679057612"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057612"><span class="hs-identifier hs-var hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Int
-</span><a href="Lib.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057617"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-225"></span><span>          </span><span id="local-6989586621679057610"><span class="annot"><span class="annottext">t :: [Int]
 </span><a href="#local-6989586621679057610"><span class="hs-identifier hs-var hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057617"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-226"></span><span>          </span><span id="local-6989586621679057611"><span class="annot"><span class="annottext">m :: Matrix Int
 </span><a href="#local-6989586621679057611"><span class="hs-identifier hs-var hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[Int]] -&gt; Matrix Int
@@ -617,15 +617,15 @@ forall a. [[a]] -&gt; Matrix a
 </span><span class="hs-identifier hs-var">M.fromLists</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Matrix Int -&gt; [[Int]]
 forall a. Matrix a -&gt; [[a]]
 </span><span class="hs-identifier hs-var">M.toLists</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057617"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="annot"><span class="annottext">[[Int]] -&gt; [[Int]] -&gt; [[Int]]
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span class="hs-special">[</span><span class="annot"><span class="annottext">[Int]
 </span><a href="#local-6989586621679057616"><span class="hs-identifier hs-var">ls</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
 </span><span id="line-227"></span><span>
-</span><span id="line-228"></span><span class="annot"><a href="Lib.html#dropElemAtIndex"><span class="hs-identifier hs-type">dropElemAtIndex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><span id="line-228"></span><span class="annot"><a href="Automata.html#dropElemAtIndex"><span class="hs-identifier hs-type">dropElemAtIndex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
 </span><span id="line-229"></span><span id="dropElemAtIndex"><span class="annot"><span class="annottext">dropElemAtIndex :: Int -&gt; [[Int]] -&gt; [[Int]]
-</span><a href="Lib.html#dropElemAtIndex"><span class="hs-identifier hs-var hs-var">dropElemAtIndex</span></a></span></span><span> </span><span id="local-6989586621679057606"><span class="annot"><span class="annottext">i :: Int
+</span><a href="Automata.html#dropElemAtIndex"><span class="hs-identifier hs-var hs-var">dropElemAtIndex</span></a></span></span><span> </span><span id="local-6989586621679057606"><span class="annot"><span class="annottext">i :: Int
 </span><a href="#local-6989586621679057606"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span id="local-6989586621679057605"><span class="annot"><span class="annottext">ls :: [[Int]]
 </span><a href="#local-6989586621679057605"><span class="hs-identifier hs-var">ls</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [[Int]] -&gt; [[Int]]
 forall a. Int -&gt; [a] -&gt; [a]
@@ -642,9 +642,9 @@ forall a. Int -&gt; [a] -&gt; [a]
 </span><a href="#local-6989586621679057605"><span class="hs-identifier hs-var">ls</span></a></span><span>
 </span><span id="line-230"></span><span>
 </span><span id="line-231"></span><span class="hs-comment">-- | This function deletes a state and all the connections it has with any other state. Please note that this function automatically reassigns new numbers for the remaining states, so the states and the associations matrix change accordingly. E.g. if you delete in the previous automata the 3rd state, then since the new automata has just 3 states, the old 4th state becomes the new 3rd state.</span><span>
-</span><span id="line-232"></span><span class="annot"><a href="Lib.html#deleteState"><span class="hs-identifier hs-type">deleteState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
+</span><span id="line-232"></span><span class="annot"><a href="Automata.html#deleteState"><span class="hs-identifier hs-type">deleteState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
 </span><span id="line-233"></span><span id="deleteState"><span class="annot"><span class="annottext">deleteState :: Automata -&gt; Int -&gt; Automata
-</span><a href="Lib.html#deleteState"><span class="hs-identifier hs-var hs-var">deleteState</span></a></span></span><span> </span><span id="local-6989586621679057602"><span class="annot"><span class="annottext">a :: Automata
+</span><a href="Automata.html#deleteState"><span class="hs-identifier hs-var hs-var">deleteState</span></a></span></span><span> </span><span id="local-6989586621679057602"><span class="annot"><span class="annottext">a :: Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679057601"><span class="annot"><span class="annottext">i :: Int
 </span><a href="#local-6989586621679057601"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span>
 </span><span id="line-234"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
@@ -652,12 +652,12 @@ forall a. Int -&gt; [a] -&gt; [a]
 forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
 </span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057601"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Set Int
-</span><a href="Lib.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Automata
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-string">&quot;This state is not one of the states of the automata.&quot;</span></span><span> </span><span class="hs-special">)</span><span>
 </span><span id="line-235"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Int
-</span><a href="Lib.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
@@ -670,12 +670,12 @@ forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
 </span><a href="#local-6989586621679057601"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; Set Int
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
 </span><span class="hs-identifier hs-var">L.length</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Automata
@@ -683,7 +683,7 @@ forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-string">&quot;You are trying to delete the only accepting state.&quot;</span></span><span class="hs-special">)</span><span>
 </span><span id="line-237"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String -&gt; Int -&gt; Matrix Int -&gt; [Int] -&gt; Automata
-</span><a href="Lib.html#createAutomata"><span class="hs-identifier hs-var">createAutomata</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Automata.html#createAutomata"><span class="hs-identifier hs-var">createAutomata</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057600"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">String
 </span><a href="#local-6989586621679057599"><span class="hs-identifier hs-var">i'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057598"><span class="hs-identifier hs-var">s0'</span></a></span><span> </span><span class="annot"><span class="annottext">Matrix Int
@@ -693,17 +693,17 @@ forall a. HasCallStack =&gt; String -&gt; a
 </span><a href="#local-6989586621679057600"><span class="hs-identifier hs-var hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Matrix Int -&gt; Int
 forall a. Matrix a -&gt; Int
 </span><span class="hs-identifier hs-var hs-var">M.nrows</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="hs-number">1</span></span><span>
 </span><span id="line-239"></span><span>          </span><span id="local-6989586621679057599"><span class="annot"><span class="annottext">i' :: String
 </span><a href="#local-6989586621679057599"><span class="hs-identifier hs-var hs-var">i'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; String
-</span><a href="Lib.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-240"></span><span>          </span><span id="local-6989586621679057595"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057595"><span class="hs-identifier hs-var hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Int
-</span><a href="Lib.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-241"></span><span>          </span><span id="local-6989586621679057598"><span class="annot"><span class="annottext">s0' :: Int
 </span><a href="#local-6989586621679057598"><span class="hs-identifier hs-var hs-var">s0'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
@@ -730,7 +730,7 @@ forall a. Set a -&gt; [a]
 </span><span class="hs-identifier hs-var">toList</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; Set Int
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Set Int -&gt; Set Int -&gt; Set Int
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
 </span><span class="hs-operator hs-var">`difference`</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Set Int
@@ -741,11 +741,11 @@ forall a. a -&gt; Set a
 </span><a href="#local-6989586621679057590"><span class="hs-identifier hs-var hs-var">rows</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Matrix Int -&gt; [[Int]]
 forall a. Matrix a -&gt; [[a]]
 </span><span class="hs-identifier hs-var">M.toLists</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057602"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-244"></span><span>          </span><span id="local-6989586621679057589"><span class="annot"><span class="annottext">rows_deleted :: [[Int]]
 </span><a href="#local-6989586621679057589"><span class="hs-identifier hs-var hs-var">rows_deleted</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [[Int]] -&gt; [[Int]]
-</span><a href="Lib.html#dropElemAtIndex"><span class="hs-identifier hs-var">dropElemAtIndex</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Automata.html#dropElemAtIndex"><span class="hs-identifier hs-var">dropElemAtIndex</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057601"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="hs-special">[</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057588"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
@@ -774,9 +774,9 @@ forall a. [[a]] -&gt; Matrix a
 </span><a href="#local-6989586621679057589"><span class="hs-identifier hs-var">rows_deleted</span></a></span><span>
 </span><span id="line-250"></span><span>
 </span><span id="line-251"></span><span class="hs-comment">-- | This function changes the initial state.</span><span>
-</span><span id="line-252"></span><span class="annot"><a href="Lib.html#changeInitialState"><span class="hs-identifier hs-type">changeInitialState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
+</span><span id="line-252"></span><span class="annot"><a href="Automata.html#changeInitialState"><span class="hs-identifier hs-type">changeInitialState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
 </span><span id="line-253"></span><span id="changeInitialState"><span class="annot"><span class="annottext">changeInitialState :: Automata -&gt; Int -&gt; Automata
-</span><a href="Lib.html#changeInitialState"><span class="hs-identifier hs-var hs-var">changeInitialState</span></a></span></span><span> </span><span id="local-6989586621679057585"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#changeInitialState"><span class="hs-identifier hs-var hs-var">changeInitialState</span></a></span></span><span> </span><span id="local-6989586621679057585"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057585"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679057584"><span class="annot"><span class="annottext">s0' :: Int
 </span><a href="#local-6989586621679057584"><span class="hs-identifier hs-var">s0'</span></a></span></span><span> </span><span>
 </span><span id="line-254"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
@@ -784,12 +784,12 @@ forall a. [[a]] -&gt; Matrix a
 forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
 </span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057584"><span class="hs-identifier hs-var">s0'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Set Int
-</span><a href="Lib.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057585"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Automata
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-string">&quot;This state is not one of the states of the automata.&quot;</span></span><span> </span><span class="hs-special">)</span><span>
 </span><span id="line-255"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Int
-</span><a href="Lib.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057585"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
@@ -805,7 +805,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="hs-string">&quot; is already the initial state.&quot;</span></span><span class="hs-special">)</span><span>
 </span><span id="line-256"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String -&gt; Int -&gt; Matrix Int -&gt; [Int] -&gt; Automata
-</span><a href="Lib.html#createAutomata"><span class="hs-identifier hs-var">createAutomata</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Automata.html#createAutomata"><span class="hs-identifier hs-var">createAutomata</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057583"><span class="hs-identifier hs-var">s'</span></a></span><span> </span><span class="annot"><span class="annottext">String
 </span><a href="#local-6989586621679057582"><span class="hs-identifier hs-var">i'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057584"><span class="hs-identifier hs-var">s0'</span></a></span><span> </span><span class="annot"><span class="annottext">Matrix Int
@@ -813,28 +813,28 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><a href="#local-6989586621679057580"><span class="hs-identifier hs-var">a</span></a></span><span>
 </span><span id="line-257"></span><span>        </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679057580"><span class="annot"><span class="annottext">a :: [Int]
 </span><a href="#local-6989586621679057580"><span class="hs-identifier hs-var hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057585"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span>
 </span><span id="line-258"></span><span>              </span><span id="local-6989586621679057583"><span class="annot"><span class="annottext">s' :: Int
 </span><a href="#local-6989586621679057583"><span class="hs-identifier hs-var hs-var">s'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Int -&gt; Int
 forall a. Set a -&gt; Int
 </span><span class="hs-identifier hs-var">size</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Set Int
-</span><a href="Lib.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057585"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-259"></span><span>              </span><span id="local-6989586621679057582"><span class="annot"><span class="annottext">i' :: String
 </span><a href="#local-6989586621679057582"><span class="hs-identifier hs-var hs-var">i'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; String
-</span><a href="Lib.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057585"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-260"></span><span>              </span><span id="local-6989586621679057581"><span class="annot"><span class="annottext">m :: Matrix Int
 </span><a href="#local-6989586621679057581"><span class="hs-identifier hs-var hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057585"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-261"></span><span>
 </span><span id="line-262"></span><span>
 </span><span id="line-263"></span><span class="hs-comment">-- | This function adds one accepting state</span><span>
-</span><span id="line-264"></span><span class="annot"><a href="Lib.html#addAcceptingState"><span class="hs-identifier hs-type">addAcceptingState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Lib.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
+</span><span id="line-264"></span><span class="annot"><a href="Automata.html#addAcceptingState"><span class="hs-identifier hs-type">addAcceptingState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Automata.html#Automata"><span class="hs-identifier hs-type">Automata</span></a></span><span>
 </span><span id="line-265"></span><span id="addAcceptingState"><span class="annot"><span class="annottext">addAcceptingState :: Automata -&gt; Int -&gt; Automata
-</span><a href="Lib.html#addAcceptingState"><span class="hs-identifier hs-var hs-var">addAcceptingState</span></a></span></span><span> </span><span id="local-6989586621679057579"><span class="annot"><span class="annottext">t :: Automata
+</span><a href="Automata.html#addAcceptingState"><span class="hs-identifier hs-var hs-var">addAcceptingState</span></a></span></span><span> </span><span id="local-6989586621679057579"><span class="annot"><span class="annottext">t :: Automata
 </span><a href="#local-6989586621679057579"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679057578"><span class="annot"><span class="annottext">a0 :: Int
 </span><a href="#local-6989586621679057578"><span class="hs-identifier hs-var">a0</span></a></span></span><span>
 </span><span id="line-266"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
@@ -842,7 +842,7 @@ forall a. Set a -&gt; Int
 forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
 </span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057578"><span class="hs-identifier hs-var">a0</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Set Int
-</span><a href="Lib.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057579"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Automata
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-string">&quot;This state is not one of the states of the automata.&quot;</span></span><span> </span><span class="hs-special">)</span><span>
@@ -850,7 +850,7 @@ forall a. HasCallStack =&gt; String -&gt; a
 forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
 </span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057578"><span class="hs-identifier hs-var">a0</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057579"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Automata
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-string">&quot;State &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
@@ -863,7 +863,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="hs-string">&quot; is already one of the accepting states.&quot;</span></span><span class="hs-special">)</span><span>
 </span><span id="line-268"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String -&gt; Int -&gt; Matrix Int -&gt; [Int] -&gt; Automata
-</span><a href="Lib.html#createAutomata"><span class="hs-identifier hs-var">createAutomata</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Automata.html#createAutomata"><span class="hs-identifier hs-var">createAutomata</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057577"><span class="hs-identifier hs-var">s'</span></a></span><span> </span><span class="annot"><span class="annottext">String
 </span><a href="#local-6989586621679057576"><span class="hs-identifier hs-var">i'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679057575"><span class="hs-identifier hs-var">s0</span></a></span><span> </span><span class="annot"><span class="annottext">Matrix Int
@@ -871,7 +871,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><a href="#local-6989586621679057573"><span class="hs-identifier hs-var">a'</span></a></span><span>
 </span><span id="line-269"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679057572"><span class="annot"><span class="annottext">a :: [Int]
 </span><a href="#local-6989586621679057572"><span class="hs-identifier hs-var hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; [Int]
-</span><a href="Lib.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAcceptingStates"><span class="hs-identifier hs-var">getAcceptingStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057579"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span>
 </span><span id="line-270"></span><span>          </span><span id="local-6989586621679057573"><span class="annot"><span class="annottext">a' :: [Int]
 </span><a href="#local-6989586621679057573"><span class="hs-identifier hs-var hs-var">a'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int]
@@ -883,19 +883,19 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><a href="#local-6989586621679057577"><span class="hs-identifier hs-var hs-var">s'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Int -&gt; Int
 forall a. Set a -&gt; Int
 </span><span class="hs-identifier hs-var">size</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Automata -&gt; Set Int
-</span><a href="Lib.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getStates"><span class="hs-identifier hs-var">getStates</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057579"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-272"></span><span>          </span><span id="local-6989586621679057576"><span class="annot"><span class="annottext">i' :: String
 </span><a href="#local-6989586621679057576"><span class="hs-identifier hs-var hs-var">i'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; String
-</span><a href="Lib.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInputs"><span class="hs-identifier hs-var">getInputs</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057579"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-273"></span><span>          </span><span id="local-6989586621679057574"><span class="annot"><span class="annottext">m :: Matrix Int
 </span><a href="#local-6989586621679057574"><span class="hs-identifier hs-var hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Matrix Int
-</span><a href="Lib.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getAssociations"><span class="hs-identifier hs-var">getAssociations</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057579"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-274"></span><span>          </span><span id="local-6989586621679057575"><span class="annot"><span class="annottext">s0 :: Int
 </span><a href="#local-6989586621679057575"><span class="hs-identifier hs-var hs-var">s0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Automata -&gt; Int
-</span><a href="Lib.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
+</span><a href="Automata.html#getInitialState"><span class="hs-identifier hs-var">getInitialState</span></a></span><span> </span><span class="annot"><span class="annottext">Automata
 </span><a href="#local-6989586621679057579"><span class="hs-identifier hs-var">t</span></a></span><span>
 </span><span id="line-275"></span><span>          </span><span>
 </span><span id="line-276"></span><span>    </span><span>
