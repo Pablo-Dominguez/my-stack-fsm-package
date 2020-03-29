@@ -1,4 +1,4 @@
-name:                my-fsm-stack-package
+name:                FSM
 version:             0.0.2.0
 github:              "Pablo-Dominguez/my-stack-fsm-package"
 license:             BSD3
@@ -11,8 +11,8 @@ extra-source-files:
 - ChangeLog.md
 
 # Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
+synopsis: Basic concepts of finite state machines.
+category: FSM
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
@@ -21,31 +21,11 @@ description:         Please see the README on GitHub at <https://github.com/Pabl
 
 dependencies:
 - base >= 4.13 && < 5
-- containers >= 0.5 && < 0.6
+- containers >= 0.5
 - matrix >= 0.3.6 && < 0.4
 - vector >= 0.12.1 && < 0.13
 
 library:
   source-dirs: src
 
-executables:
-  my-fsm-stack-package-exe:
-    main:                Main.hs
-    source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - my-fsm-stack-package
 
-tests:
-  my-fsm-stack-package-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - my-fsm-stack-package

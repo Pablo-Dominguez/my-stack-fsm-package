@@ -1,7 +1,7 @@
 
 -- Import packages -----------------------------------------
 
-module Lib (
+module Automata (
 
     Automata,
     -- * Creating functions
