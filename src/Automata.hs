@@ -32,13 +32,36 @@ import Data.Set
 import qualified Data.List   as L
 import qualified Data.Matrix as M
 import qualified Data.Vector as V
-    
 
+-- Custom show functions ---------------------------------------
+
+showIntSet :: [Int] -> Int -> String
+showIntSet [l] 0 = id "{" ++ show l ++ id "}"
+showIntSet [l] _ = show l ++ id "}"
+showIntSet (l:ls) 0 = id "{" ++ show l ++ id ","++ showIntSet ls 1
+showIntSet (l:ls) k = show l ++ id ","++ showIntSet ls k
+
+showCharSet :: [Char] -> Int -> String
+showCharSet [l] 0 = id "{" ++ show l ++ id "}"
+showCharSet [l] _ = show l ++ id "}"
+showCharSet (l:ls) 0 = id "{" ++ show l ++ id ","++ showCharSet ls 1
+showCharSet (l:ls) k = show l ++ id ","++ showCharSet ls k
+    
 -- Create data types -----------------------------------------
 
 data Automata = A (Set Int,Set Char,Int,M.Matrix Int,Set Int)
-                deriving Show
+                --deriving Show
 
+instance Show Automata where
+    show (A (s,i,s0,m,a)) = 
+        (id "\n" ++ id "Set of states:" ++ id "\n" ++ s' ++ id "\n" ) ++
+        (id "\n" ++ id "Set of inputs (language):" ++ id "\n"  ++ i' ++ id "\n" ) ++
+        (id "\n" ++ id "Initial state:" ++ id "\n" ++ show s0 ++ id "\n" ) ++
+        (id "\n" ++ id "Matrix of associations:" ++ id "\n" ++ show m ++ id "\n" ) ++
+        (id "\n" ++ id "Set of accepting states:" ++ id "\n" ++ a') ++ id "\n" 
+        where s' = showIntSet (toList s) 0
+              i' = showCharSet (toList i) 0
+              a' = showIntSet (toList a) 0
 
 -- Creating functions -----------------------------------------
 
@@ -168,18 +191,41 @@ getTransitions t k
           row = V.toList (M.getRow k m)
           l = [ a | (a,k) <- zip i row, k /= 0]
 
+-- | This function returns the states you can possibly reach from a given state.
+--
+getOutgoingStates :: Automata -> Int -> Set Int
+getOutgoingStates t k
+    | not (member k s) = error "Not a valid state"
+    | otherwise = fromList l
+    where m = getAssociations t
+          s = getStates t
+          row = V.toList (M.getRow k m)
+          l = [ p | p <- row, p /= 0]
+          
+-- | This function returns the states that can possibly reach a given state.
+--
+getIncomingStates :: Automata -> Int -> Set Int
+getIncomingStates t k
+    | not (member k s) = error "Not a valid state"
+    | otherwise = fromList l
+    where m = getAssociations t
+          s = getStates t
+          rows = [(n,member k (fromList (V.toList (M.getRow n m)))) | n <- [1..(M.nrows m)]]
+          l = [n | (n,bool) <- rows, bool == True]         
+          
 -- | This function returns those states of the automata that do not have any input to any other state, i.e., once that a 'hole' state is reached, none of the rest of state can be reached anymore for the current execution.
 getHoles :: Automata -> Set Int
 getHoles t = fromList hs
     where A (s,i,s0,m,a) = t 
           hs = [n | n <- toList s,
                 and [n == (M.getRow n m)V.!k || (M.getRow n m)V.!k == 0 | k <- [0..((size i)-1)]]]
-         
--- getHoles devuelve los estados de los que no parte ninguna arista, i.e. aquellos en los que la matriz tiene en su fila todos los elementos iguales al índice de la fila o nulos
 
-               
-
- 
+-- | This function returns the states of the given automata that cannot be reached.
+--
+getIsolated :: Automata -> Set Int
+getIsolated t = fromList l
+    where s = getStates t
+          l = [ p | p <- toList s, getIncomingStates t p == empty]
 
 
 -- Checking functions -----------------------------------------
