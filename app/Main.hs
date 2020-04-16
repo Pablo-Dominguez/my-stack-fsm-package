@@ -1,6 +1,8 @@
 module Main where
 
-import Data.Automata
+import FSM.Automata
+import FSM.States
+--import FSM.States
 
 main :: IO ()
 main = return ()
