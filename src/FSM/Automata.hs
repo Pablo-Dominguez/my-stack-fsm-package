@@ -7,7 +7,7 @@ module FSM.Automata (
     -- * Creating functions
     createAutomata,
     
-    -- * Accesing functions
+    -- * Accessing functions
     getStates,
     getAcceptingStates,
     getInitialState,
