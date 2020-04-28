@@ -14,7 +14,11 @@ module FSM.Automata (
     getInputs,
     getAssociations,
     getTransitions,
+    getCurrentState,
+    getOutgoingStates,
+    getIncomingStates,
     getHoles,
+    getIsolated,
     
     -- * Checking functions
     validInput,
@@ -26,6 +30,7 @@ module FSM.Automata (
     addState,
     deleteState,
     changeInitialState,
+    changeCurrentState,
     addAcceptingState
      
 
@@ -308,7 +313,8 @@ dropElemAtIndex i ls = L.take (i-1) ls ++ L.drop i ls
 -- | This function deletes a state and all the connections it has with any other state. Please note that this function automatically reassigns new numbers for the remaining states, so the states and the associations matrix change accordingly. E.g. if you delete in the previous automata the 3rd state, then since the new automata has just 3 states, the old 4th state becomes the new 3rd state.
 deleteState :: Automata -> Int ->Automata
 deleteState a i 
-    | not (elem i (getStates a)) = error ( "This state is not one of the states of the automata." )
+    | not (elem i (getStates a)) = a
+        --error ( "This state is not one of the states of the automata." )
     | (getInitialState a) == i = error ( "You are trying to delete the initial state. If you want to perform this action, first change the initial state and then delete the old one.")
     | elem i (fromList (getAcceptingStates a)) && L.length (getAcceptingStates a) == 1 = error ("You are trying to delete the only accepting state.")
     | i == c = error ( "You are trying to delete the current state. If you want to perform this action, first change the current state and then delete the old one.")
