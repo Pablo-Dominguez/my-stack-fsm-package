@@ -191,5 +191,26 @@ checkEUprevious seenbefore_map (p:ps) sublabel ls
     where Just previous_bool = Map.lookup p seenbefore_map
           Just previous_marked = Map.lookup p sublabel
 
-checkCTLauxAU :: (CTL a) -> AutomataInfo (CTL a) -> Automata ->  Map.Map Int Bool -> Map.Map Int Int -> [State]
-checkCTLauxAU (AU a b) info tom label_map degree_map init_list sublabel1
+checkCTLauxAU :: (CTL a) -> AutomataInfo (CTL a) -> Automata ->  Map.Map Int Bool -> Map.Map Int Int -> [State] ->  Map.Map Int Bool ->  Map.Map Int Bool 
+checkCTLauxAU (AU a b) info tom label_map degree_map (l:ls) sublabel =
+    let previous_states = toList (getIncomingStates tom l)
+        f _ = Just True
+        new_map = Map.update f l label_map
+        (added_previous,new_degree_map) = checkAUprevious new_map degree_map previous_states sublabel ls
+    in checkCTLauxAU (AU a b) info tom new_map new_degree_map added_previous sublabel
+
+
+        
+checkAUprevious :: Map.Map Int Bool -> Map.Map Int Int -> [State] -> Map.Map Int Bool -> [State] -> ([State], Map.Map Int Int)
+checkAUprevious label_map degree_map [] sublabel ls = (ls,degree_map)
+checkAUprevious label_map degree_map (p:ps) sublabel ls =
+    if (new_degree == 0) && (previous_marked == True) && (label == False)
+    then checkAUprevious label_map new_degree_map ps sublabel (ls++[p])
+    else checkAUprevious label_map new_degree_map ps sublabel ls
+    where Just previous_degree = Map.lookup p degree_map
+          new_degree = previous_degree -1
+          f _ = Just new_degree
+          new_degree_map = Map.update f p degree_map
+          Just previous_marked = Map.lookup p sublabel
+          Just label = Map.lookup p label_map
+          
