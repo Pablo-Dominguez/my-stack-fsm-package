@@ -47,7 +47,7 @@ instance Eq a => Eq (CTL a) where
     (EF a) == (Not (AX (Not b))) = a == b
     (EG a) == (Not (AX (Not b))) = a == b
     
-    (AU p q) == Not (Or (EU (Not q') (Not (Or p' q'))) (EG (Not q'))) = (p == p') && (q == q')
+    (AU a b) == Not (Or (EU (Not c1) (Not (Or d c2))) (EG (Not c3))) = (a == d) && (b == c1) && (c1 == c2) && (c2 == c3)
             
 -- A(phi) = ¬ E (¬ phi)
              
@@ -82,7 +82,20 @@ checkCTL (And a b) tom info = andMap (checkCTL a tom info) (checkCTL b tom info)
 checkCTL (EX a) tom info =
     let states = (toList (getStates tom))
     in checkCTLaux (EX a) info tom states (Map.fromList [(x,False) | x <- states])
---checkCTL (EU a) tom info =
+checkCTL (EU a b) tom info = 
+    let sublabel1 = checkCTL a tom info
+        sublabel2 = checkCTL b tom info
+        states = (toList (getStates tom))
+        init_list = [x | (x,k) <- (Map.toList sublabel2), k == True]
+    in checkCTLauxEU (EU a b) info tom (Map.fromList [(x,False) | x <- states]) (Map.fromList [(x,False) | x <- states]) init_list sublabel1
+checkCTL (AU a b) tom info = 
+    let sublabel1 = checkCTL a tom info
+        sublabel2 = checkCTL b tom info
+        states = (toList (getStates tom))
+        degree_map = Map.fromList [(x,length (toList (getOutgoingStates tom x))) | x <- states]
+        label_map = (Map.fromList [(x,False) | x <- states])
+        init_list = [x | (x,k) <- (Map.toList sublabel2), k == True]
+    in checkCTLauxAU (AU a b) info tom label_map degree_map init_list sublabel1
     
 
 checkCTLaux :: Eq a => CTL a -> AutomataInfo (CTL a) -> Automata -> [State] ->  Map.Map Int Bool -> Map.Map Int Bool
@@ -153,3 +166,30 @@ checkCTLauxEX (EX a) info tom (l:ls) label_map marked_map =
         f _ = Just new_bool
         new_map = Map.update f l label_map
     in checkCTLauxEX (EX a) info tom ls new_map marked_map
+
+checkCTLauxEU :: CTL a -> AutomataInfo (CTL a) -> Automata ->  Map.Map Int Bool -> Map.Map Int Bool -> [State] -> Map.Map Int Bool -> Map.Map Int Bool
+checkCTLauxEU (EU a b) info tom label_map seenbefore_map [] sublabel = label_map
+checkCTLauxEU (EU a b) info tom label_map seenbefore_map (k:ks) sublabel = 
+    let previous_states = toList (getIncomingStates tom k)
+        f _ = Just True
+        new_map = Map.update f k label_map
+        (added_previous,new_seenbefore_map) = checkEUprevious seenbefore_map previous_states sublabel ks
+    in checkCTLauxEU (EU a b) info tom new_map new_seenbefore_map added_previous sublabel
+        
+        
+        
+checkEUprevious :: Map.Map Int Bool -> [State] -> Map.Map Int Bool -> [State] -> ([State],Map.Map Int Bool)
+checkEUprevious seenbefore_map [] sublabel ls = (ls,seenbefore_map)
+checkEUprevious seenbefore_map (p:ps) sublabel ls 
+    | previous_bool == False = 
+        let f _ = Just True
+            new_seenbefore_map = Map.update f p seenbefore_map
+        in if previous_marked == True
+            then checkEUprevious new_seenbefore_map ps sublabel (ls++[p])
+            else checkEUprevious new_seenbefore_map ps sublabel ls
+    | otherwise = checkEUprevious seenbefore_map ps sublabel ls 
+    where Just previous_bool = Map.lookup p seenbefore_map
+          Just previous_marked = Map.lookup p sublabel
+
+checkCTLauxAU :: (CTL a) -> AutomataInfo (CTL a) -> Automata ->  Map.Map Int Bool -> Map.Map Int Int -> [State]
+checkCTLauxAU (AU a b) info tom label_map degree_map init_list sublabel1
