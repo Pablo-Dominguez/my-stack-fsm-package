@@ -7,7 +7,7 @@ cabal-version: 1.12
 -- hash: fe188947cbf6cfabbd09d7ce88601c5e5e53a462619fa621cd19b37804881f19
 
 name:           FSM
-version:        0.0.3.0
+version:        0.0.4.0
 synopsis:       Basic concepts of finite state machines.
 description:    Please see the README on GitHub at <https://github.com/Pablo-Dominguez/my-stack-fsm-package#readme>
 category:       FSM

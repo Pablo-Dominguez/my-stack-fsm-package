@@ -1,5 +1,12 @@
 
-module FSM.Logic where
+module FSM.Logic (
+    -- * Definition of the CTL language
+    CTL (..),
+    
+    -- * Implementation of the model checking algorithm for CTL
+    checkCTL
+    
+) where
 
 import FSM.States
 import FSM.Automata
@@ -7,21 +14,29 @@ import FSM.Automata
 import Data.Set
 import qualified Data.Map as Map
 
-             
-data CTL a = Atom a
-            | Not (CTL a)
-            | And (CTL a) (CTL a)
-            | Or (CTL a) (CTL a)
-            | EX (CTL a)
-            | EF (CTL a)
-            | EG (CTL a)
-            | AX (CTL a)
-            | AF (CTL a)
-            | AG (CTL a)
-            | EU (CTL a) (CTL a)
-            | AU (CTL a) (CTL a)
-            deriving (Ord,Show)
-            
+-- | This is the definition of the CTL language. More info about this language can be found <https://en.wikipedia.org/wiki/Computation_tree_logic here>. You can find the details of the constructors in the definition of the 'CTL' data.
+--
+--
+-- Here you can find a visual explanation of the constructors defined below.
+-- <<https://i.imgur.com/e4tPiOY.jpg CTL examples>>
+--
+-- <https://www.researchgate.net/figure/CTL-tree-logic-1_fig6_257343964 Source>: A SAFE COTS-BASED DESIGN FLOW OF EMBEDDED SYSTEMS by Salam Hajjar
+--
+
+data CTL a = Atom a -- ^ It defines an atomic statement. E.g.:     'Atom' @"The plants look great."@
+        | Not (CTL a) --  'Not' negates a 'CTL' formula.
+        | And (CTL a) (CTL a) --  'And' 
+        | Or (CTL a) (CTL a)
+        | EX (CTL a) -- ^ 'EX' means that the 'CTL' formula holds in at least one of the inmediate successors states.
+        | EF (CTL a) -- ^ 'EF' means that the 'CTL' formula holds in at least one of the future states.
+        | EG (CTL a) -- ^ 'EG' means that the 'CTL' formula holds always from one of the future states.
+        | AX (CTL a) -- ^ 'AX' means that the 'CTL' formula holds in every one of the inmediate successors states.
+        | AF (CTL a) -- ^ 'AF' means that the 'CTL' formula holds in at least one state of every possible path.
+        | AG (CTL a) -- ^ 'AG' means that the 'CTL' formula holds in the current states and all the successors in all paths. (It is true globally)
+        | EU (CTL a) (CTL a) -- ^ 'EU' means that exists a path from the current state that satisfies the first 'CTL' formula /until/ it reaches a state in that path that satisfies the second 'CTL' formula.
+        | AU (CTL a) (CTL a) -- ^ 'AU' means that every path from the current state satisfies the first 'CTL' formula /until/ it reaches a state that satisfies the second 'CTL' formula.
+        deriving (Ord,Show)
+
 instance Eq a => Eq (CTL a) where
     (Atom a) == (Atom b) = a == b
     (Not a) == (Not b) = a == b
@@ -48,7 +63,8 @@ instance Eq a => Eq (CTL a) where
     (EG a) == (Not (AX (Not b))) = a == b
     
     (AU a b) == Not (Or (EU (Not c1) (Not (Or d c2))) (EG (Not c3))) = (a == d) && (b == c1) && (c1 == c2) && (c2 == c3)
-            
+   
+--
 -- A(phi) = ¬ E (¬ phi)
              
 -- Derived operators
@@ -73,6 +89,14 @@ aU p q = Not (orCTL (EU (Not q) (Not (orCTL p q))) (EG (Not q)))
 -}
 --A[φUψ] == ¬( E[(¬ψ)U¬(φ∨ψ)] ∨ EG(¬ψ) )
 
+-- | This is the function that implements the model checking algorithm for CTL as defined by Queille, Sifakis, Clarke, Emerson and Sistla <https://dl.acm.org/doi/abs/10.1145/5397.5399 here> and that was later improved. 
+--
+-- This function takes as an argument a 'CTL' formula, an 'Automata' and information about the states as defined in "FSM.Automata" and "FSM.States" respectively and checks whether the 'Automata' implies the 'CTL' formula. Once the algorithm has finished, you just need to look at the value in the initial state of the automata to know if it does, for example with:
+--
+-- @
+-- Map.lookup (getInitialState 'Automata') (checkCTL 'CTL' 'Automata' 'AutomataInfo')
+-- @ 
+--
 checkCTL :: Eq a => CTL a -> Automata -> AutomataInfo (CTL a) -> Map.Map Int Bool
 checkCTL (Atom a) tom info = 
     let states = (toList (getStates tom))
