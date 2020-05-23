@@ -14,23 +14,18 @@ module FSM.Automata (
     getInputs,
     getAssociations,
     getTransitions,
-    getCurrentState,
     getOutgoingStates,
     getIncomingStates,
-    getHoles,
+    getDeadlocks,
     getIsolated,
     
     -- * Checking functions
     validInput,
-    
-    -- * Action functions
-    
-    performAction,
+        
     -- * Editing functions
     addState,
     deleteState,
     changeInitialState,
-    changeCurrentState,
     addAcceptingState
      
 
@@ -57,17 +52,17 @@ showCharSet (l:ls) k = show l ++ id ","++ showCharSet ls k
     
 -- Create data types -----------------------------------------
 
-data Automata = A (Set Int,Set Char,Int,M.Matrix Int,Set Int,Int)
+data Automata = A (Set Int,Set Char,Int,M.Matrix Int,Set Int)
                 --deriving Show
                 
 instance Show Automata where
-    show (A (s,i,s0,m,a,c)) = 
+    show (A (s,i,s0,m,a)) = 
         (id "\n" ++ id "Set of states:" ++ id "\n" ++ s' ++ id "\n" ) ++
-        (id "\n" ++ id "Set of inputs (language):" ++ id "\n"  ++ i' ++ id "\n" ) ++
+        (id "\n" ++ id "Set of inputs (alphabet):" ++ id "\n"  ++ i' ++ id "\n" ) ++
         (id "\n" ++ id "Initial state:" ++ id "\n" ++ show s0 ++ id "\n" ) ++
         (id "\n" ++ id "Matrix of associations:" ++ id "\n" ++ show m ++ id "\n" ) ++
-        (id "\n" ++ id "Set of accepting states:" ++ id "\n" ++ a') ++ 
-        (id "\n" ++ id "Current state:" ++ id "\n" ++ show c ++ id "\n") ++ id "\n" 
+        (id "\n" ++ id "Set of accepting states:" ++ id "\n" ++ a')
+        --(id "\n" ++ id "Current state:" ++ id "\n" ++ show c ++ id "\n") ++ id "\n" 
         where s' = showIntSet (toList s) 0
               i' = showCharSet (toList i) 0
               a' = showIntSet (toList a) 0
@@ -78,25 +73,24 @@ instance Show Automata where
 --
 --  Please pay attention to how the object is built. E.g.,
 --
--- > createAutomata s i s0 m a c0
+-- > createAutomata s i s0 m a
 --  where:
 --
 -- -s is the number of states of the automata.
--- -i is the language the automata accepts.
+-- -i is the alphabet the automata accepts.
 -- -s0 is the initial state of the automata.
 -- -m is the matrix of associations of the automata. (Details here: 'getAssociations')
 -- -a is the list of accepting states of the automata.
--- -c0 is the placeholder for the current state. If it's the first time defining this Automata, leave it as c0 = s0
 --
 -- More specifically you could
 --
 -- > import qualified Data.Matrix as M
 -- > mat = M.fromLists [[2,0,0,0],[2,1,4,0],[1,4,0,0],[0,0,0,3]]
--- > tom = createAutomata 4 ['a', 'b', 'c', 'd'] 1 mat [4] 1
+-- > tom = createAutomata 4 ['a', 'b', 'c', 'd'] 1 mat [4]
 
 
-createAutomata :: Int -> String -> Int -> M.Matrix Int -> [Int] -> Int -> Automata
-createAutomata s i s0 m a c0
+createAutomata :: Int -> String -> Int -> M.Matrix Int -> [Int] -> Automata
+createAutomata s i s0 m a
     | s < 1 = 
         error "Number of states must be greater than 1"
     | not (member s0 s') =
@@ -107,7 +101,7 @@ createAutomata s i s0 m a c0
         error "Not valid matrix elems"
     | not (isSubsetOf a' s') =
         error "Not valid accepting states"
-    | otherwise = A (s',i',s0,m,a',c0)
+    | otherwise = A (s',i',s0,m,a')
       where s' = fromList [1..s]
             i' = fromList (L.sort i)
             a' = fromList (L.sort a)
@@ -120,27 +114,27 @@ createAutomata s i s0 m a c0
 -- | This function returns the set of states of the automata. It is really of not much use since the generation of the automata only needs the number of states and not the whole set of them, but just in case you want to check which states does the current automata have. 
 getStates :: Automata -> Set Int 
 getStates t = s
-    where A (s,i,s0,m,a,c) = t
+    where A (s,i,s0,m,a) = t
 
 -- | This function returns the list of accepting states of the automata. It is a list and not a set for coherence purpouses. When you build the automata you have to give a list of accepting states so I though it made sense to also return a list of accepting states as the accessing function.
 getAcceptingStates :: Automata -> [Int]
 getAcceptingStates t = a'
-    where A (s,i,s0,m,a,c) = t     
+    where A (s,i,s0,m,a) = t     
           a' = toList a
 
 -- | This function returns the current initial state of the automata.
 getInitialState :: Automata -> Int 
 getInitialState t = s0
-    where A (s,i,s0,m,a,c) = t 
+    where A (s,i,s0,m,a) = t 
 
--- | This function returns the string of inputs that the automata accepts.    
+-- | This function returns the string of inputs (alphabet) that the automata accepts.    
 getInputs :: Automata -> String
 getInputs t = toList i
-    where A (s,i,s0,m,a,c) = t 
+    where A (s,i,s0,m,a) = t 
           
 -- | This function returns the associations matrix of the automata.  This matrix is built according to the following rules:
 --
--- 1. The columns of the matrix represent the inputs of the language that the automata accepts in <https://en.wikipedia.org/wiki/Lexicographical_order lexicographical order>.
+-- 1. The columns of the matrix represent the inputs of the alphabet that the automata accepts in <https://en.wikipedia.org/wiki/Lexicographical_order lexicographical order>.
 -- 2. The rows of the matrix represent the states of the automata in ascending order.
 -- 3. The element \(a_{ij} = k \) means that the state  \(i\) is connected to the state  \(k\) thanks to the input that the column  \(j\)  of the matrix represents.
 --
@@ -191,7 +185,7 @@ getInputs t = toList i
 
 getAssociations :: Automata -> M.Matrix Int
 getAssociations t = m
-    where A (s,i,s0,m,a,c) = t
+    where A (s,i,s0,m,a) = t
          
 -- | This function returns the inputs that a state accepts for transitioning into another state.
 --
@@ -204,12 +198,13 @@ getTransitions t k
           s = getStates t
           row = V.toList (M.getRow k m)
           l = [ a | (a,k) <- zip i row, k /= 0]
+          
 
--- | This function returns the current state in which the automata currently is.
---
-getCurrentState :: Automata -> Int
-getCurrentState t = c
-    where A (s,i,s0,m,a,c) = t 
+-- -- | This function returns the current state in which the automata currently is.
+-- --
+-- getCurrentState :: Automata -> Int
+-- getCurrentState t = c
+--     where A (s,i,s0,m,a,c) = t 
           
 -- | This function returns the states you can possibly reach from a given state.
 --
@@ -233,19 +228,28 @@ getIncomingStates t k
           rows = [(n,member k (fromList (V.toList (M.getRow n m)))) | n <- [1..(M.nrows m)]]
           l = [n | (n,bool) <- rows, bool == True]         
           
--- | This function returns those states of the automata that do not have any input to any other state, i.e., once that a 'hole' state is reached, none of the rest of state can be reached anymore for the current execution.
-getHoles :: Automata -> Set Int
-getHoles t = fromList hs
-    where A (s,i,s0,m,a,c) = t 
-          hs = [n | n <- toList s,
-                and [n == (M.getRow n m)V.!k || (M.getRow n m)V.!k == 0 | k <- [0..((size i)-1)]]]
+-- | This function returns those states of the automata that do not have any input to any other state (except for itself), i.e., once that a 'deadlock' state is reached, none of the rest of state can be reached anymore for the current execution.
+getDeadlocks :: Automata -> Set Int
+getDeadlocks t = Data.Set.filter (\ p -> (Data.Set.null (getOutgoingStates t p) || 
+                                        (getOutgoingStates t p) == Data.Set.fromList [p])) s
+    where A (s,i,s0,m,a) = t 
+-- getDeadlocks :: Automata -> Set Int
+-- getDeadlocks t = fromList hs
+--     where A (s,i,s0,m,a,c) = t 
+--           hs = [n | n <- toList s,
+--                 and [n == (M.getRow n m)V.!k || (M.getRow n m)V.!k == 0 | k <- [0..((size i)-1)]]]
 
 -- | This function returns the states of the given automata that cannot be reached.
 --
 getIsolated :: Automata -> Set Int
+getIsolated t = Data.Set.filter (\ p -> (Data.Set.null (getIncomingStates t p) ||
+                                (getIncomingStates t p) == Data.Set.fromList [p])) s
+  where A (s,i,s0,m,a) = t
+{-
+getIsolated :: Automata -> Set Int
 getIsolated t = fromList l
     where s = getStates t
-          l = [ p | p <- toList s, getIncomingStates t p == empty]
+          l = [ p | p <- toList s, getIncomingStates t p == empty]-}
 
 
 -- Checking functions -----------------------------------------
@@ -253,10 +257,7 @@ getIsolated t = fromList l
 validInputAux :: String -> Automata -> Int -> Bool
 validInputAux str a k
     | not (isSubsetOf (fromList str) i) = error "Invalid input"
-    | elem k h && member k ac = True
-    | elem k h && not (member k ac) = False
-    | L.null str && member k ac = True
-    | L.null str && not (member k ac) = False
+    | L.null str = member k ac
     | not (member st (getTransitions a k)) =  error ("Not valid input "  ++ (show st) ++ " for state " ++ (show k) )
     | otherwise = validInputAux (tail str) a k'
     where s = getStates a
@@ -264,7 +265,6 @@ validInputAux str a k
           s0 = getInitialState a
           m = getAssociations a
           ac = fromList (getAcceptingStates a)
-          h = getHoles a
           st = head str
           k' = M.getElem k ((findIndex st i)+1) m
          
@@ -276,21 +276,21 @@ validInput :: String -> Automata -> Bool
 validInput str a = validInputAux str a s0
     where s0 = getInitialState a
 
--- Action functions
-
--- | This funcion perform the given transition from the current state and changes to a new current state.
-performAction :: Automata -> Char -> Automata
-performAction t char
-    | not (member char i) = error ("This is not one of the valid inputs. Please try again with one of the following options: " ++ ts')
-    | not (member char ts) = error ("This is not one of the valid inputs for the current state. Please try again with one of the following options: " ++ ts')
-    | otherwise = changeCurrentState t c'
-        where i = fromList (getInputs t)
-              c = getCurrentState t
-              ts = getTransitions t c
-              ts' = showCharSet (toList ts) 0
-              m = getAssociations t
-              n = (findIndex char i) + 1
-              c' = M.getElem c n m
+-- -- Action functions
+-- 
+-- -- | This funcion perform the given transition from the current state and changes to a new current state.
+-- performAction :: Automata -> Char -> Automata
+-- performAction t char
+--     | not (member char i) = error ("This is not one of the valid inputs. Please try again with one of the following options: " ++ ts')
+--     | not (member char ts) = error ("This is not one of the valid inputs for the current state. Please try again with one of the following options: " ++ ts')
+--     | otherwise = changeCurrentState t c'
+--         where i = fromList (getInputs t)
+--               c = getCurrentState t
+--               ts = getTransitions t c
+--               ts' = showCharSet (toList ts) 0
+--               m = getAssociations t
+--               n = (findIndex char i) + 1
+--               c' = M.getElem c n m
 
 -- Editing functions -----------------------------------------
 
@@ -299,12 +299,11 @@ performAction t char
 addState :: Automata -> [Int] -> Automata
 addState a ls 
     | L.length ls /= L.length (getInputs a) = error ( "Not a valid list of associations" ) 
-    | otherwise = createAutomata s i s0 m t c
+    | otherwise = createAutomata s i s0 m t
     where s = (M.nrows (getAssociations a)) +1
           i = getInputs a
           s0 = getInitialState a
           t = getAcceptingStates a
-          c = getCurrentState a
           m = M.fromLists ((M.toLists (getAssociations a))++[ls])
 
 dropElemAtIndex :: Int -> [[Int]] -> [[Int]]
@@ -317,11 +316,9 @@ deleteState a i
         --error ( "This state is not one of the states of the automata." )
     | (getInitialState a) == i = error ( "You are trying to delete the initial state. If you want to perform this action, first change the initial state and then delete the old one.")
     | elem i (fromList (getAcceptingStates a)) && L.length (getAcceptingStates a) == 1 = error ("You are trying to delete the only accepting state.")
-    | i == c = error ( "You are trying to delete the current state. If you want to perform this action, first change the current state and then delete the old one.")
-    | otherwise = createAutomata s i' s0' m t c
+    | otherwise = createAutomata s i' s0' m t
     where s = (M.nrows (getAssociations a)) -1
           i' = getInputs a
-          c = getCurrentState a
           s0 = getInitialState a
           s0' = if s0 < i then s0 else s0-1
           t = [if l < i then l else l-1 | l <- toList ((fromList (getAcceptingStates a)) `difference` singleton i)]
@@ -338,34 +335,32 @@ changeInitialState :: Automata -> Int -> Automata
 changeInitialState t s0' 
     | not (elem s0' (getStates t)) = error ( "This state is not one of the states of the automata." )
     | (getInitialState t) == s0' = error ( "State " ++ show s0' ++ " is already the initial state.")
-    | otherwise = createAutomata s' i' s0' m a c
+    | otherwise = createAutomata s' i' s0' m a
         where a = getAcceptingStates t 
-              c = getCurrentState t
               s' = size (getStates t)
               i' = getInputs t
               m = getAssociations t
 
--- | This function changes the current state.
-changeCurrentState :: Automata -> Int -> Automata
-changeCurrentState t c'
-    | not (elem c' (getStates t)) = error ( "This state is not one of the states of the automata." )
-    | (getCurrentState t) == c' = error ( "State " ++ show c' ++ " is already the current state.")
-    | otherwise = createAutomata s' i' s0 m a c
-        where a = getAcceptingStates t 
-              s0 = getInitialState t
-              c = getCurrentState t
-              s' = size (getStates t)
-              i' = getInputs t
-              m = getAssociations t 
+-- -- | This function changes the current state.
+-- changeCurrentState :: Automata -> Int -> Automata
+-- changeCurrentState t c'
+--     | not (elem c' (getStates t)) = error ( "This state is not one of the states of the automata." )
+--     | (getCurrentState t) == c' = error ( "State " ++ show c' ++ " is already the current state.")
+--     | otherwise = createAutomata s' i' s0 m a c
+--         where a = getAcceptingStates t 
+--               s0 = getInitialState t
+--               c = getCurrentState t
+--               s' = size (getStates t)
+--               i' = getInputs t
+--               m = getAssociations t 
     
 -- | This function adds one accepting state
 addAcceptingState :: Automata -> Int -> Automata
 addAcceptingState t a0
     | not (elem a0 (getStates t)) = error ( "This state is not one of the states of the automata." )
     | elem a0 (getAcceptingStates t)  = error ( "State " ++ show a0 ++ " is already one of the accepting states.")
-    | otherwise = createAutomata s' i' s0 m a' c
+    | otherwise = createAutomata s' i' s0 m a'
     where a = getAcceptingStates t
-          c = getCurrentState t
           a' = a ++ [a0]
           s' = size (getStates t)
           i' = getInputs t
