@@ -23,7 +23,10 @@ import qualified Data.Map as Map
 -- <https://www.researchgate.net/figure/CTL-tree-logic-1_fig6_257343964 Source>: A SAFE COTS-BASED DESIGN FLOW OF EMBEDDED SYSTEMS by Salam Hajjar
 --
 
-data CTL a = Atom a -- ^ It defines an atomic statement. E.g.:     'Atom' @"The plants look great."@
+data CTL a = CTrue | CFalse -- ^ Basic bools.
+        | RArrow a b -- ^ Basic imply.
+        | DArrow a b -- ^ Basic double imply.
+        | Atom a -- ^ It defines an atomic statement. E.g.:     'Atom' @"The plants look great."@
         | Not (CTL a) --  'Not' negates a 'CTL' formula.
         | And (CTL a) (CTL a) --  'And' 
         | Or (CTL a) (CTL a)
@@ -38,10 +41,12 @@ data CTL a = Atom a -- ^ It defines an atomic statement. E.g.:     'Atom' @"The 
         deriving (Ord,Show)
 
 instance Eq a => Eq (CTL a) where
+    (CTrue) == Not (CFalse) = True
     (Atom a) == (Atom b) = a == b
     (Not a) == (Not b) = a == b
     (And a b) == (And c d) = (a == c) && (b == d)
     (Or a b) == (Or c d) = (a == c) && (b == d)
+    (RArrow a b) == (Or (Not c) d) = (a == c) && (b == d)
     (EX a) == (EX b) = a == b
     (EF a) == (EF b) = a == b
     (EG a) == (EG b) = a == b
@@ -99,21 +104,29 @@ instance Eq a => Eq (LTL a) where
 -- @ 
 --
 checkCTL :: Eq a => CTL a -> Automata -> AutomataInfo (CTL a) -> Map.Map Int Bool
+checkCTL CTrue tom info = 
+    let states = (toList (getStates tom))
+    in Map.fromList [(x,True) | x <- states]
 checkCTL (Atom a) tom info =
     let states = (toList (getStates tom))
     in checkCTLauxAtom (Atom a) info tom states Map.empty
 checkCTL (Not a) tom info = checkCTLauxNot (checkCTL a tom info)
 checkCTL (And a b) tom info = checkCTLauxAnd (checkCTL a tom info) (checkCTL b tom info)
+checkCTL (Or a b) tom info = checkCTL (Not (And (Not a) (Not b))) tom info
+checkCTL (RArrow a b) tom info = checkCTL (Or (Not a) b) tom info
+checkCTL (DArrow a b) tom info = checkCTL (Or (And a b) (And (Not a) (Not b))) tom info
 checkCTL (EX a) tom info =
   let states = (toList (getStates tom))
       sublabel = checkCTL a tom info
-  in checkCTLauxEX tom states sublabel Map.empty
+  in checkCTLauxEX tom states sublabel (Map.fromList [(x,False) | x <- states])
+checkCTL (AX a) tom info = checkCTL (Not (EX (Not a))) tom info
 checkCTL (EU a b) tom info = 
     let sublabel1 = checkCTL a tom info
         sublabel2 = checkCTL b tom info
         states = (toList (getStates tom))
         init_list = [x | (x,k) <- (Map.toList sublabel2), k == True]
     in checkCTLauxEU tom (Map.fromList [(x,False) | x <- states]) (Map.fromList [(x,False) | x <- states]) init_list sublabel1
+checkCTL (EF a) tom info = checkCTL (EU CTrue a) tom info
 checkCTL (AU a b) tom info = 
     let sublabel1 = checkCTL a tom info
         sublabel2 = checkCTL b tom info
@@ -122,6 +135,9 @@ checkCTL (AU a b) tom info =
         label_map = (Map.fromList [(x,False) | x <- states])
         init_list = [x | (x,k) <- (Map.toList sublabel2), k == True]
     in checkCTLauxAU tom label_map degree_map init_list sublabel1
+checkCTL (AF a) tom info = checkCTL (AU CTrue a) tom info
+checkCTL (EG a) tom info = checkCTL (Not (AF (Not a))) tom info
+checkCTL (AG a) tom info = checkCTL (Not (EF (Not a))) tom info
     
 
 checkCTLauxAtom :: Eq a => CTL a -> AutomataInfo (CTL a) -> Automata -> [State] ->  Map.Map Int Bool -> Map.Map Int Bool
@@ -159,14 +175,14 @@ andMapAux label_map1 label_map2 (l:ls) =
     in andMapAux new_map label_map2 ls
     
 checkCTLauxEX :: Automata -> [State] ->  Map.Map Int Bool -> Map.Map Int Bool -> Map.Map Int Bool
-checkCTLauxEX tom [] label_map marked_map = label_map
+checkCTLauxEX tom [] label_map marked_map = marked_map
 checkCTLauxEX tom (l:ls) label_map marked_map =
     let connected = toList (getOutgoingStates tom l)
-        connected_map = Map.filterWithKey (\k _ -> (elem k connected)) marked_map
+        connected_map = Map.filterWithKey (\k _ -> (elem k connected)) label_map
         new_bool = or (Map.elems connected_map)
         f _ = Just new_bool
-        new_map = Map.update f l label_map -- es alter?
-    in checkCTLauxEX tom ls marked_map new_map
+        new_map = Map.update f l marked_map -- es alter?
+    in checkCTLauxEX tom ls label_map new_map
 
 checkCTLauxEU :: Automata ->  Map.Map Int Bool -> Map.Map Int Bool -> [State] -> Map.Map Int Bool -> Map.Map Int Bool
 checkCTLauxEU tom label_map seenbefore_map [] sublabel = label_map
