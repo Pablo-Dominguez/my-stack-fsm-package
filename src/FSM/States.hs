@@ -180,25 +180,26 @@ alterStateInfo state (Just tag) sinf (AutomataInfo info)
             new_state_map = Map.alter g state info
         in AutomataInfo {toMap = new_state_map}
 
-
+{-
 emptyState :: State -> AutomataInfo a
 emptyState state = AutomataInfo {toMap = Map.singleton state output}
-        where output = StateInfo {tagMap = Map.empty}
+        where output = StateInfo {tagMap = Map.empty}-}
 
-unionStateAux :: AutomataInfo a -> AutomataInfo a -> AutomataInfo a -> [State] -> AutomataInfo a
-unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo output) [l] 
-    | (elem l (getStatesWithInfo (AutomataInfo info1))) && (not (elem l (getStatesWithInfo (AutomataInfo info2)))) = (AutomataInfo output)
-    | (not (elem l (getStatesWithInfo (AutomataInfo info1)))) && (elem l (getStatesWithInfo (AutomataInfo info2))) = 
-        let tag_map2 = tagMap (getInfoInState (AutomataInfo info2) l Nothing)
-            tag_output = StateInfo {tagMap = tag_map2}
-            state_output = Map.singleton l tag_output
-        in (AutomataInfo (Map.union state_output output))
-    | otherwise = 
-        let tag_map1 = tagMap (getInfoInState (AutomataInfo info1) l Nothing)
-            tag_map2 = tagMap (getInfoInState (AutomataInfo info2) l Nothing)
-            tag_output = StateInfo {tagMap = Map.union tag_map1 tag_map2}
-            state_output = Map.singleton l tag_output
-        in (AutomataInfo (Map.union state_output output))
+-- unionStateAux :: AutomataInfo a -> AutomataInfo a -> AutomataInfo a -> [State] -> AutomataInfo a
+-- unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo output) [l] 
+--     | (elem l (getStatesWithInfo (AutomataInfo info1))) && (not (elem l (getStatesWithInfo (AutomataInfo info2)))) = (AutomataInfo output)
+--     | (not (elem l (getStatesWithInfo (AutomataInfo info1)))) && (elem l (getStatesWithInfo (AutomataInfo info2))) = 
+--         let tag_map2 = tagMap (getInfoInState (AutomataInfo info2) l Nothing)
+--             tag_output = StateInfo {tagMap = tag_map2}
+--             state_output = Map.singleton l tag_output
+--         in (AutomataInfo (Map.union state_output output))
+--     | otherwise = 
+--         let tag_map1 = tagMap (getInfoInState (AutomataInfo info1) l Nothing)
+--             tag_map2 = tagMap (getInfoInState (AutomataInfo info2) l Nothing)
+--             tag_output = StateInfo {tagMap = Map.union tag_map1 tag_map2}
+--             state_output = Map.singleton l tag_output
+--         in (AutomataInfo (Map.union state_output output))
+unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo output) [] = (AutomataInfo output)
 unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo output) (l:ls)
     | (elem l (getStatesWithInfo (AutomataInfo info1))) && (not (elem l (getStatesWithInfo (AutomataInfo info2)))) = unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo output) ls
     | (not (elem l (getStatesWithInfo (AutomataInfo info1)))) && (elem l (getStatesWithInfo (AutomataInfo info2))) = 
@@ -215,6 +216,12 @@ unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo output) (l
             
 -- | This function takes the left-biased union of t1 and t2. It prefers t1 when duplicate keys are encountered. Works similarly to <http://hackage.haskell.org/package/containers-0.6.2.1/docs/Data-Map-Strict.html#g:12 Data.Map.union>.
 --
-unionStateInfo :: AutomataInfo a -> AutomataInfo a -> AutomataInfo a
+{-unionStateInfo :: AutomataInfo a -> AutomataInfo a -> AutomataInfo a
 unionStateInfo (AutomataInfo info1) (AutomataInfo info2) = unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo info1) ls
-    where ls = L.union (getStatesWithInfo (AutomataInfo info1)) (getStatesWithInfo (AutomataInfo info2)) 
+    where ls = L.union (getStatesWithInfo (AutomataInfo info1)) (getStatesWithInfo (AutomataInfo info2))-} 
+          
+unionStateInfo :: AutomataInfo a -> AutomataInfo a -> AutomataInfo a
+unionStateInfo (AutomataInfo info1) (AutomataInfo info2) =
+  AutomataInfo (Map.unionWith (\ (StateInfo sti1) (StateInfo sti2) ->
+                                 (StateInfo (Map.union sti1 sti2)))
+                info1 info2)

@@ -4,7 +4,10 @@ module FSM.Logic (
     CTL (..),
     
     -- * Implementation of the model checking algorithm for CTL
-    checkCTL
+    checkCTL,
+    modelsCTL    
+    
+    
     
 ) where
 
@@ -24,8 +27,8 @@ import qualified Data.Map as Map
 --
 
 data CTL a = CTrue | CFalse -- ^ Basic bools.
-        | RArrow a b -- ^ Basic imply.
-        | DArrow a b -- ^ Basic double imply.
+        | RArrow (CTL a) (CTL a) -- ^ Basic imply.
+        | DArrow (CTL a) (CTL a) -- ^ Basic double imply.
         | Atom a -- ^ It defines an atomic statement. E.g.:     'Atom' @"The plants look great."@
         | Not (CTL a) --  'Not' negates a 'CTL' formula.
         | And (CTL a) (CTL a) --  'And' 
@@ -208,6 +211,7 @@ checkEUprevious seenbefore_map (p:ps) sublabel ls
           Just previous_marked = Map.lookup p sublabel
 
 checkCTLauxAU :: Automata ->  Map.Map Int Bool -> Map.Map Int Int -> [State] ->  Map.Map Int Bool ->  Map.Map Int Bool 
+checkCTLauxAU tom label_map degree_map [] sublabel = label_map
 checkCTLauxAU tom label_map degree_map (l:ls) sublabel =
     let previous_states = toList (getIncomingStates tom l)
         f _ = Just True
@@ -227,3 +231,9 @@ checkAUprevious label_map degree_map (p:ps) sublabel ls =
           new_degree_map = Map.update f p degree_map
           Just previous_marked = Map.lookup p sublabel
           Just label = Map.lookup p label_map
+
+          
+          
+modelsCTL :: Eq a => CTL a -> Automata -> AutomataInfo (CTL a) -> Bool
+modelsCTL a tom info = model
+    where (Just model) = Map.lookup (getInitialState tom) (checkCTL a tom info)
