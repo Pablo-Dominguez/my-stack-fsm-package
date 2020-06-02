@@ -5,7 +5,10 @@ module FSM.Logic (
     
     -- * Implementation of the model checking algorithm for CTL
     checkCTL,
-    modelsCTL    
+    modelsCTL,
+    checkFormulas,
+    checkAUprevious,
+    checkCTLauxAU
     
     
     
@@ -204,7 +207,7 @@ checkEUprevious seenbefore_map (p:ps) sublabel ls
         let f _ = Just True
             new_seenbefore_map = Map.update f p seenbefore_map
         in if previous_marked == True
-            then checkEUprevious new_seenbefore_map ps sublabel (ls++[p])
+            then checkEUprevious new_seenbefore_map ps sublabel (toList (fromList (ls++[p])))
             else checkEUprevious new_seenbefore_map ps sublabel ls
     | otherwise = checkEUprevious seenbefore_map ps sublabel ls 
     where Just previous_bool = Map.lookup p seenbefore_map
@@ -223,7 +226,7 @@ checkAUprevious :: Map.Map Int Bool -> Map.Map Int Int -> [State] -> Map.Map Int
 checkAUprevious label_map degree_map [] sublabel ls = (ls,degree_map)
 checkAUprevious label_map degree_map (p:ps) sublabel ls =
     if (new_degree == 0) && (previous_marked == True) && (label == False)
-    then checkAUprevious label_map new_degree_map ps sublabel (ls++[p])
+    then checkAUprevious label_map new_degree_map ps sublabel (toList (fromList (ls++[p])))
     else checkAUprevious label_map new_degree_map ps sublabel ls
     where Just previous_degree = Map.lookup p degree_map
           new_degree = previous_degree -1
@@ -237,3 +240,8 @@ checkAUprevious label_map degree_map (p:ps) sublabel ls =
 modelsCTL :: Eq a => CTL a -> Automata -> AutomataInfo (CTL a) -> Bool
 modelsCTL a tom info = model
     where (Just model) = Map.lookup (getInitialState tom) (checkCTL a tom info)
+          
+
+checkFormulas :: Eq a => Automata -> AutomataInfo (CTL a) -> [CTL a] -> [Bool] -> [Bool]
+checkFormulas tom info [] bs = bs
+checkFormulas tom info (l:ls) bs = checkFormulas tom info ls (bs++[modelsCTL l tom info])

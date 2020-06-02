@@ -39,16 +39,16 @@ import qualified Data.Vector as V
 -- Custom show functions ---------------------------------------
 
 showIntSet :: [Int] -> Int -> String
-showIntSet [l] 0 = id "{" ++ show l ++ id "}"
-showIntSet [l] _ = show l ++ id "}"
-showIntSet (l:ls) 0 = id "{" ++ show l ++ id ","++ showIntSet ls 1
-showIntSet (l:ls) k = show l ++ id ","++ showIntSet ls k
+showIntSet [] 0 = id "{" ++ id "}"
+showIntSet [] _ = id "}"
+showIntSet (l:ls) 0 = id "{" ++ show l ++ showIntSet ls 1
+showIntSet (l:ls) k = id "," ++ show l ++ showIntSet ls k
 
 showCharSet :: [Char] -> Int -> String
-showCharSet [l] 0 = id "{" ++ show l ++ id "}"
-showCharSet [l] _ = show l ++ id "}"
-showCharSet (l:ls) 0 = id "{" ++ show l ++ id ","++ showCharSet ls 1
-showCharSet (l:ls) k = show l ++ id ","++ showCharSet ls k
+showCharSet [] 0 = id "{" ++ id "}"
+showCharSet [] _ = id "}"
+showCharSet (l:ls) 0 = id "{" ++ show l ++ showCharSet ls 1
+showCharSet (l:ls) k = id "," ++ show l ++ showCharSet ls k
     
 -- Create data types -----------------------------------------
 
@@ -295,7 +295,7 @@ validInput str a = validInputAux str a s0
 -- Editing functions -----------------------------------------
 
 
--- | Function for adding a state to an Automata with the list of associations to the other states. If you would want to add a non-connected state, simply enter the list [0,..,0], with as many zeros as possible inputs.
+-- | Function for adding a state to an Automata with the list of associations to the other states. If you would want to add a non-connected state, simply enter the list [0,..,0], with as many zeros as possible inputs. 
 addState :: Automata -> [Int] -> Automata
 addState a ls 
     | L.length ls /= L.length (getInputs a) = error ( "Not a valid list of associations" ) 

@@ -6,7 +6,7 @@
 -- One caveat you should always take into account when using this package is that without some data creation from the user, the use of this package is a bit restricted. This happens because the way it is built the package forbids you to use more than one type of information between states (or inside one), so to work around this, if you want to have multiple types of information inside states, do as follows:
 --
 -- @
---   data myCustomData = Type1 String | Type2 Int deriving (Show,Eq)
+--   data CustomData = Type1 String | Type2 Int deriving (Show,Eq)
 -- @
 -- 
 -- dont forget about the deriving because otherwise it will conflict with the functions in the package.
@@ -73,7 +73,7 @@ instance Show a => Show (AutomataInfo a) where
 -- 
 -- If you created your own data type, you can do as follows:
 --
--- > my_info = createStateInfo 4 "tag" (Type2 Int)
+-- > my_info = createStateInfo 4 "tag" (Type2 25)
 --
 createStateInfo :: State -> Tag -> a -> AutomataInfo a
 createStateInfo state tag k = AutomataInfo {toMap = Map.singleton state (StateInfo {tagMap = Map.singleton tag k})}
@@ -85,11 +85,13 @@ createStateInfo state tag k = AutomataInfo {toMap = Map.singleton state (StateIn
 -- > fromlsStateInfo 4 [("foo", Type1 "on"),("bar", Type2 0)] (Just my_info)
 --
 fromlsStateInfo :: Eq a => State -> [(Tag,a)] -> Maybe (AutomataInfo a) -> AutomataInfo a
+fromlsStateInfo state [] Nothing = AutomataInfo {toMap = Map.empty}
 fromlsStateInfo state (l:ls) Nothing 
     | ls /= [] = fromlsStateInfo state ls (Just first_info)
     | otherwise = first_info
     where (tag,value) = l
           first_info = createStateInfo state tag value
+fromlsStateInfo state [] (Just info) = info
 fromlsStateInfo state (l:ls) (Just (AutomataInfo info)) 
     | ls /= [] = fromlsStateInfo state ls (Just new_aut_info)
     | otherwise = new_aut_info
