@@ -6,12 +6,8 @@ module FSM.Logic (
     -- * Implementation of the model checking algorithm for CTL
     checkCTL,
     modelsCTL,
-    checkFormulas,
-    checkAUprevious,
-    checkCTLauxAU
-    
-    
-    
+    checkFormulas
+
 ) where
 
 import FSM.States
@@ -235,13 +231,16 @@ checkAUprevious label_map degree_map (p:ps) sublabel ls =
           Just previous_marked = Map.lookup p sublabel
           Just label = Map.lookup p label_map
 
-          
-          
+-- | This function returns the result of \(automata \models formula \).
+--          
 modelsCTL :: Eq a => CTL a -> Automata -> AutomataInfo (CTL a) -> Bool
 modelsCTL a tom info = model
     where (Just model) = Map.lookup (getInitialState tom) (checkCTL a tom info)
           
 
+          
+-- | This function loops over multiple formulas and tells you if the automata models each formula.
+--
 checkFormulas :: Eq a => Automata -> AutomataInfo (CTL a) -> [CTL a] -> [Bool] -> [Bool]
 checkFormulas tom info [] bs = bs
 checkFormulas tom info (l:ls) bs = checkFormulas tom info ls (bs++[modelsCTL l tom info])

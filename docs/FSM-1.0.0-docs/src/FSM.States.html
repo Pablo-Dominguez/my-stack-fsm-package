@@ -1,0 +1,774 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span>
+</span><span id="line-2"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-3"></span><span class="hs-comment">--</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- = Considerations</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- One caveat you should always take into account when using this package is that without some data creation from the user, the use of this package is a bit restricted. This happens because the way it is built the package forbids you to use more than one type of information between states (or inside one), so to work around this, if you want to have multiple types of information inside states, do as follows:</span><span>
+</span><span id="line-7"></span><span class="hs-comment">--</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--   data CustomData = Type1 String | Type2 Int deriving (Show,Eq)</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- dont forget about the deriving because otherwise it will conflict with the functions in the package.</span><span>
+</span><span id="line-13"></span><span>  </span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">FSM.States</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier">State</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier">Tag</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier">StateInfo</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier">AutomataInfo</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>        </span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Creating functions</span></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="FSM.States.html#createStateInfo"><span class="hs-identifier">createStateInfo</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="FSM.States.html#fromlsStateInfo"><span class="hs-identifier">fromlsStateInfo</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>        </span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Accessing functions</span></span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><a href="FSM.States.html#getStateInfo"><span class="hs-identifier">getStateInfo</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier">getStatesWithInfo</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>    </span><span class="annot"><a href="FSM.States.html#getTagsInState"><span class="hs-identifier">getTagsInState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><a href="FSM.States.html#getInfoInState"><span class="hs-identifier">getInfoInState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>    </span><span>
+</span><span id="line-32"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Editing functions</span></span><span>
+</span><span id="line-33"></span><span>    </span><span class="annot"><a href="FSM.States.html#alterStateInfo"><span class="hs-identifier">alterStateInfo</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-34"></span><span>    </span><span class="annot"><a href="FSM.States.html#unionStateInfo"><span class="hs-identifier">unionStateInfo</span></a></span><span>
+</span><span id="line-35"></span><span>    </span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>   </span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">L</span></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">type</span><span> </span><span id="State"><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-var">State</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">type</span><span> </span><span id="Tag"><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">newtype</span><span> </span><span id="StateInfo"><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-var">StateInfo</span></a></span></span><span> </span><span id="local-6989586621679065162"><span class="annot"><a href="#local-6989586621679065162"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="StateInfo"><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-var">StateInfo</span></a></span></span><span> </span><span class="hs-special">{</span><span id="tagMap"><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065162"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679065101"><span id="local-6989586621679065103"><span class="annot"><span class="annottext">StateInfo a -&gt; StateInfo a -&gt; Bool
+(StateInfo a -&gt; StateInfo a -&gt; Bool)
+-&gt; (StateInfo a -&gt; StateInfo a -&gt; Bool) -&gt; Eq (StateInfo a)
+forall a. Eq a =&gt; StateInfo a -&gt; StateInfo a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: StateInfo a -&gt; StateInfo a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; StateInfo a -&gt; StateInfo a -&gt; Bool
+== :: StateInfo a -&gt; StateInfo a -&gt; Bool
+$c== :: forall a. Eq a =&gt; StateInfo a -&gt; StateInfo a -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">newtype</span><span> </span><span id="AutomataInfo"><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span></span><span> </span><span id="local-6989586621679065156"><span class="annot"><a href="#local-6989586621679065156"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AutomataInfo"><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="toMap"><span class="annot"><span class="annottext">AutomataInfo a -&gt; Map State (StateInfo a)
+</span><a href="FSM.States.html#toMap"><span class="hs-identifier hs-var hs-var">toMap</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type">StateInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065156"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679065094"><span id="local-6989586621679065096"><span class="annot"><span class="annottext">AutomataInfo a -&gt; AutomataInfo a -&gt; Bool
+(AutomataInfo a -&gt; AutomataInfo a -&gt; Bool)
+-&gt; (AutomataInfo a -&gt; AutomataInfo a -&gt; Bool)
+-&gt; Eq (AutomataInfo a)
+forall a. Eq a =&gt; AutomataInfo a -&gt; AutomataInfo a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: AutomataInfo a -&gt; AutomataInfo a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; AutomataInfo a -&gt; AutomataInfo a -&gt; Bool
+== :: AutomataInfo a -&gt; AutomataInfo a -&gt; Bool
+$c== :: forall a. Eq a =&gt; AutomataInfo a -&gt; AutomataInfo a -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-comment">--data UserStateInfo = UserStateInfo { rate :: Float } deriving Show</span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span id="local-6989586621679065163"><span class="annot"><a href="FSM.States.html#verboseShowStateInfo"><span class="hs-identifier hs-type">verboseShowStateInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679065163"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065163"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span><span>
+</span><span id="line-52"></span><span id="verboseShowStateInfo"><span class="annot"><span class="annottext">verboseShowStateInfo :: Map Tag a -&gt; Tag
+</span><a href="FSM.States.html#verboseShowStateInfo"><span class="hs-identifier hs-var hs-var">verboseShowStateInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((Tag, a) -&gt; Tag) -&gt; [(Tag, a)] -&gt; Tag
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="annot"><span class="annottext">(Tag, a) -&gt; Tag
+forall a. Show a =&gt; (Tag, a) -&gt; Tag
+</span><a href="#local-6989586621679065091"><span class="hs-identifier hs-var">formatter</span></a></span><span> </span><span class="annot"><span class="annottext">([(Tag, a)] -&gt; Tag)
+-&gt; (Map Tag a -&gt; [(Tag, a)]) -&gt; Map Tag a -&gt; Tag
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map Tag a -&gt; [(Tag, a)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><span class="hs-identifier hs-var">Map.toAscList</span></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679065091"><span class="annot"><span class="annottext">formatter :: (Tag, a) -&gt; Tag
+</span><a href="#local-6989586621679065091"><span class="hs-identifier hs-var hs-var">formatter</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679065088"><span class="annot"><span class="annottext">k :: Tag
+</span><a href="#local-6989586621679065088"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679065087"><span class="annot"><span class="annottext">v :: a
+</span><a href="#local-6989586621679065087"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Tag] -&gt; Tag
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;--&gt; [tag] &quot;</span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065088"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;: &quot;</span></span><span class="hs-special">,</span><span class="annot"><span class="hs-string">&quot;\n&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Tag
+forall a. Show a =&gt; a -&gt; Tag
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679065087"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;\n&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-54"></span><span>        </span><span>
+</span><span id="line-55"></span><span id="local-6989586621679065084"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679065079"><span id="local-6989586621679065082"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679065084"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type">StateInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065084"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-56"></span><span>  </span><span id="local-6989586621679065077"><span class="annot"><span class="annottext">show :: StateInfo a -&gt; Tag
+</span><a href="#local-6989586621679065077"><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a -&gt; Tag
+forall a. Show a =&gt; Map Tag a -&gt; Tag
+</span><a href="FSM.States.html#verboseShowStateInfo"><span class="hs-identifier hs-var">verboseShowStateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Tag a -&gt; Tag)
+-&gt; (StateInfo a -&gt; Map Tag a) -&gt; StateInfo a -&gt; Tag
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+forall a. StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span></span><span>        </span><span>
+</span><span id="line-57"></span><span>  </span><span>
+</span><span id="line-58"></span><span id="local-6989586621679065157"><span class="annot"><a href="FSM.States.html#verboseShow"><span class="hs-identifier hs-type">verboseShow</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679065157"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type">StateInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065157"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span><span>
+</span><span id="line-59"></span><span id="verboseShow"><span class="annot"><span class="annottext">verboseShow :: Map State (StateInfo a) -&gt; Tag
+</span><a href="FSM.States.html#verboseShow"><span class="hs-identifier hs-var hs-var">verboseShow</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((State, StateInfo a) -&gt; Tag) -&gt; [(State, StateInfo a)] -&gt; Tag
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="annot"><span class="annottext">(State, StateInfo a) -&gt; Tag
+forall a a. (Show a, Show a) =&gt; (a, StateInfo a) -&gt; Tag
+</span><a href="#local-6989586621679065075"><span class="hs-identifier hs-var">formatter</span></a></span><span> </span><span class="annot"><span class="annottext">([(State, StateInfo a)] -&gt; Tag)
+-&gt; (Map State (StateInfo a) -&gt; [(State, StateInfo a)])
+-&gt; Map State (StateInfo a)
+-&gt; Tag
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; [(State, StateInfo a)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><span class="hs-identifier hs-var">Map.toAscList</span></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679065075"><span class="annot"><span class="annottext">formatter :: (a, StateInfo a) -&gt; Tag
+</span><a href="#local-6989586621679065075"><span class="hs-identifier hs-var hs-var">formatter</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679065074"><span class="annot"><span class="annottext">s :: a
+</span><a href="#local-6989586621679065074"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679065073"><span class="annot"><span class="annottext">i :: StateInfo a
+</span><a href="#local-6989586621679065073"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Tag] -&gt; Tag
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-string">&quot;=&gt; The elements in state &quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Tag
+forall a. Show a =&gt; a -&gt; Tag
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679065074"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot; are:\n&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Map Tag a -&gt; Tag
+forall a. Show a =&gt; Map Tag a -&gt; Tag
+</span><a href="FSM.States.html#verboseShowStateInfo"><span class="hs-identifier hs-var">verboseShowStateInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+forall a. StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679065073"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-string">&quot;\n&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span id="local-6989586621679065072"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679065067"><span id="local-6989586621679065070"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679065072"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065072"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-64"></span><span>  </span><span id="local-6989586621679065066"><span class="annot"><span class="annottext">show :: AutomataInfo a -&gt; Tag
+</span><a href="#local-6989586621679065066"><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; Tag
+forall a. Show a =&gt; Map State (StateInfo a) -&gt; Tag
+</span><a href="FSM.States.html#verboseShow"><span class="hs-identifier hs-var">verboseShow</span></a></span><span> </span><span class="annot"><span class="annottext">(Map State (StateInfo a) -&gt; Tag)
+-&gt; (AutomataInfo a -&gt; Map State (StateInfo a))
+-&gt; AutomataInfo a
+-&gt; Tag
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">AutomataInfo a -&gt; Map State (StateInfo a)
+forall a. AutomataInfo a -&gt; Map State (StateInfo a)
+</span><a href="FSM.States.html#toMap"><span class="hs-identifier hs-var hs-var">toMap</span></a></span></span><span> </span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span>  </span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- Creating functions ------------------------</span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- | This function takes a State, a Tag and a value and creates an AutomataInfo object containing only the given State with the value and the tag associated to it.</span><span>
+</span><span id="line-70"></span><span class="hs-comment">-- E.g.:</span><span>
+</span><span id="line-71"></span><span class="hs-comment">--</span><span>
+</span><span id="line-72"></span><span class="hs-comment">-- &gt; createStateInfo 4 &quot;tag&quot; 25</span><span>
+</span><span id="line-73"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- If you created your own data type, you can do as follows:</span><span>
+</span><span id="line-75"></span><span class="hs-comment">--</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- &gt; my_info = createStateInfo 4 &quot;tag&quot; (Type2 25)</span><span>
+</span><span id="line-77"></span><span class="hs-comment">--</span><span>
+</span><span id="line-78"></span><span id="local-6989586621679065147"><span class="annot"><a href="FSM.States.html#createStateInfo"><span class="hs-identifier hs-type">createStateInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679065147"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065147"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-79"></span><span id="createStateInfo"><span class="annot"><span class="annottext">createStateInfo :: State -&gt; Tag -&gt; a -&gt; AutomataInfo a
+</span><a href="FSM.States.html#createStateInfo"><span class="hs-identifier hs-var hs-var">createStateInfo</span></a></span></span><span> </span><span id="local-6989586621679065065"><span class="annot"><span class="annottext">state :: State
+</span><a href="#local-6989586621679065065"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span id="local-6989586621679065064"><span class="annot"><span class="annottext">tag :: Tag
+</span><a href="#local-6989586621679065064"><span class="hs-identifier hs-var">tag</span></a></span></span><span> </span><span id="local-6989586621679065063"><span class="annot"><span class="annottext">k :: a
+</span><a href="#local-6989586621679065063"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AutomataInfo :: forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type hs-type">AutomataInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">toMap :: Map State (StateInfo a)
+</span><a href="FSM.States.html#toMap"><span class="hs-identifier hs-var">toMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; StateInfo a -&gt; Map State (StateInfo a)
+forall k a. k -&gt; a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.singleton</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065065"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">StateInfo :: forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type hs-type">StateInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">tagMap :: Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var">tagMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; a -&gt; Map Tag a
+forall k a. k -&gt; a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.singleton</span></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065064"><span class="hs-identifier hs-var">tag</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679065063"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">}</span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- | This function takes a State, a list of (Tag,value) and Maybe AutomataInfo and returns the AutomataInfo updated with the list of tags given. Please notice that if Nothing is given, it will return the created AutomataInfo while if a (Just AutomataInfo) object is given, it will update the tags in the given state.</span><span>
+</span><span id="line-82"></span><span class="hs-comment">-- E.g. (notice that we are using @my_info@ from the previous example)</span><span>
+</span><span id="line-83"></span><span class="hs-comment">--</span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- &gt; fromlsStateInfo 4 [(&quot;foo&quot;, Type1 &quot;on&quot;),(&quot;bar&quot;, Type2 0)] Nothing</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- &gt; fromlsStateInfo 4 [(&quot;foo&quot;, Type1 &quot;on&quot;),(&quot;bar&quot;, Type2 0)] (Just my_info)</span><span>
+</span><span id="line-86"></span><span class="hs-comment">--</span><span>
+</span><span id="line-87"></span><span id="local-6989586621679065149"><span class="annot"><a href="FSM.States.html#fromlsStateInfo"><span class="hs-identifier hs-type">fromlsStateInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679065149"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span class="hs-special">,</span><span class="annot"><a href="#local-6989586621679065149"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065149"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065149"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-88"></span><span id="fromlsStateInfo"><span class="annot"><span class="annottext">fromlsStateInfo :: State -&gt; [(Tag, a)] -&gt; Maybe (AutomataInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#fromlsStateInfo"><span class="hs-identifier hs-var hs-var">fromlsStateInfo</span></a></span></span><span> </span><span id="local-6989586621679065059"><span class="annot"><span class="annottext">state :: State
+</span><a href="#local-6989586621679065059"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AutomataInfo :: forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type hs-type">AutomataInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">toMap :: Map State (StateInfo a)
+</span><a href="FSM.States.html#toMap"><span class="hs-identifier hs-var">toMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+forall k a. Map k a
+</span><span class="hs-identifier hs-var">Map.empty</span></span><span class="hs-special">}</span><span>
+</span><span id="line-89"></span><span class="annot"><a href="FSM.States.html#fromlsStateInfo"><span class="hs-identifier hs-var">fromlsStateInfo</span></a></span><span> </span><span id="local-6989586621679065057"><span class="annot"><span class="annottext">state :: State
+</span><a href="#local-6989586621679065057"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679065056"><span class="annot"><span class="annottext">l :: (Tag, a)
+</span><a href="#local-6989586621679065056"><span class="hs-identifier hs-var">l</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679065055"><span class="annot"><span class="annottext">ls :: [(Tag, a)]
+</span><a href="#local-6989586621679065055"><span class="hs-identifier hs-var">ls</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span>
+</span><span id="line-90"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">[(Tag, a)]
+</span><a href="#local-6989586621679065055"><span class="hs-identifier hs-var">ls</span></a></span><span> </span><span class="annot"><span class="annottext">[(Tag, a)] -&gt; [(Tag, a)] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; [(Tag, a)] -&gt; Maybe (AutomataInfo a) -&gt; AutomataInfo a
+forall a.
+Eq a =&gt;
+State -&gt; [(Tag, a)] -&gt; Maybe (AutomataInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#fromlsStateInfo"><span class="hs-identifier hs-var">fromlsStateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065057"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">[(Tag, a)]
+</span><a href="#local-6989586621679065055"><span class="hs-identifier hs-var">ls</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; Maybe (AutomataInfo a)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+</span><a href="#local-6989586621679065053"><span class="hs-identifier hs-var">first_info</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+</span><a href="#local-6989586621679065053"><span class="hs-identifier hs-var">first_info</span></a></span><span>
+</span><span id="line-92"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679065052"><span class="annot"><span class="annottext">tag :: Tag
+</span><a href="#local-6989586621679065052"><span class="hs-identifier hs-var">tag</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679065051"><span class="annot"><span class="annottext">value :: a
+</span><a href="#local-6989586621679065051"><span class="hs-identifier hs-var">value</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tag, a)
+</span><a href="#local-6989586621679065056"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-93"></span><span>          </span><span id="local-6989586621679065053"><span class="annot"><span class="annottext">first_info :: AutomataInfo a
+</span><a href="#local-6989586621679065053"><span class="hs-identifier hs-var hs-var">first_info</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; Tag -&gt; a -&gt; AutomataInfo a
+forall a. State -&gt; Tag -&gt; a -&gt; AutomataInfo a
+</span><a href="FSM.States.html#createStateInfo"><span class="hs-identifier hs-var">createStateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065057"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065052"><span class="hs-identifier hs-var">tag</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679065051"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-94"></span><span class="annot"><a href="FSM.States.html#fromlsStateInfo"><span class="hs-identifier hs-var">fromlsStateInfo</span></a></span><span> </span><span id="local-6989586621679065050"><span class="annot"><span class="annottext">state :: State
+</span><a href="#local-6989586621679065050"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679065049"><span class="annot"><span class="annottext">info :: AutomataInfo a
+</span><a href="#local-6989586621679065049"><span class="hs-identifier hs-var">info</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+</span><a href="#local-6989586621679065049"><span class="hs-identifier hs-var">info</span></a></span><span>
+</span><span id="line-95"></span><span class="annot"><a href="FSM.States.html#fromlsStateInfo"><span class="hs-identifier hs-var">fromlsStateInfo</span></a></span><span> </span><span id="local-6989586621679065048"><span class="annot"><span class="annottext">state :: State
+</span><a href="#local-6989586621679065048"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679065047"><span class="annot"><span class="annottext">l :: (Tag, a)
+</span><a href="#local-6989586621679065047"><span class="hs-identifier hs-var">l</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679065046"><span class="annot"><span class="annottext">ls :: [(Tag, a)]
+</span><a href="#local-6989586621679065046"><span class="hs-identifier hs-var">ls</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679065045"><span class="annot"><span class="annottext">info :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065045"><span class="hs-identifier hs-var">info</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span>
+</span><span id="line-96"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">[(Tag, a)]
+</span><a href="#local-6989586621679065046"><span class="hs-identifier hs-var">ls</span></a></span><span> </span><span class="annot"><span class="annottext">[(Tag, a)] -&gt; [(Tag, a)] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; [(Tag, a)] -&gt; Maybe (AutomataInfo a) -&gt; AutomataInfo a
+forall a.
+Eq a =&gt;
+State -&gt; [(Tag, a)] -&gt; Maybe (AutomataInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#fromlsStateInfo"><span class="hs-identifier hs-var">fromlsStateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065048"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">[(Tag, a)]
+</span><a href="#local-6989586621679065046"><span class="hs-identifier hs-var">ls</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; Maybe (AutomataInfo a)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+</span><a href="#local-6989586621679065044"><span class="hs-identifier hs-var">new_aut_info</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+</span><a href="#local-6989586621679065044"><span class="hs-identifier hs-var">new_aut_info</span></a></span><span>
+</span><span id="line-98"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679065043"><span class="annot"><span class="annottext">tag :: Tag
+</span><a href="#local-6989586621679065043"><span class="hs-identifier hs-var">tag</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679065042"><span class="annot"><span class="annottext">value :: a
+</span><a href="#local-6989586621679065042"><span class="hs-identifier hs-var">value</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tag, a)
+</span><a href="#local-6989586621679065047"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-99"></span><span>          </span><span id="local-6989586621679065041"><span class="annot"><span class="annottext">new_info :: AutomataInfo a
+</span><a href="#local-6989586621679065041"><span class="hs-identifier hs-var hs-var">new_info</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; Tag -&gt; a -&gt; AutomataInfo a
+forall a. State -&gt; Tag -&gt; a -&gt; AutomataInfo a
+</span><a href="FSM.States.html#createStateInfo"><span class="hs-identifier hs-var">createStateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065048"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065043"><span class="hs-identifier hs-var">tag</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679065042"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-100"></span><span>          </span><span id="local-6989586621679065044"><span class="annot"><span class="annottext">new_aut_info :: AutomataInfo a
+</span><a href="#local-6989586621679065044"><span class="hs-identifier hs-var hs-var">new_aut_info</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AutomataInfo a -&gt; AutomataInfo a -&gt; AutomataInfo a
+forall a. AutomataInfo a -&gt; AutomataInfo a -&gt; AutomataInfo a
+</span><a href="FSM.States.html#unionStateInfo"><span class="hs-identifier hs-var">unionStateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+</span><a href="#local-6989586621679065041"><span class="hs-identifier hs-var">new_info</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065045"><span class="hs-identifier hs-var">info</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-101"></span><span>          </span><span>
+</span><span id="line-102"></span><span class="hs-comment">{-
+-- quiero hacer una funcion que une la info con dos AutomataInfos (uni&#243;n de conjuntos)
+-- y otra funcion que a partir de un (State,[(Tag,a)]) crea el AutomataInfo
+fromListAux :: Int -&gt; [(State,[(Tag,a)])] -&gt; AutomataInfo a
+fromListAux 0 (l:ls) = 
+    where (state,tag_list) = l
+          
+
+
+fromListStateInfo :: [(State,[(Tag,a)])] -&gt; AutomataInfo a
+fromListStateInfo ls = fromListAux 0 ls
+-}</span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- Accessing functions ------------------------</span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span id="local-6989586621679065040"><span class="annot"><a href="FSM.States.html#getStateInfo"><span class="hs-identifier hs-type">getStateInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type">StateInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065040"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065040"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-118"></span><span id="getStateInfo"><span class="annot"><span class="annottext">getStateInfo :: StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#getStateInfo"><span class="hs-identifier hs-var hs-var">getStateInfo</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type">StateInfo</span></a></span><span> </span><span id="local-6989586621679065039"><span class="annot"><span class="annottext">k :: Map Tag a
+</span><a href="#local-6989586621679065039"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679065039"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-119"></span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span class="hs-comment">-- | This function returns the states of the given AutomataInfo that currently contain some information</span><span>
+</span><span id="line-122"></span><span class="hs-comment">--</span><span>
+</span><span id="line-123"></span><span id="local-6989586621679065138"><span class="annot"><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-type">getStatesWithInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065138"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-type">State</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-124"></span><span id="getStatesWithInfo"><span class="annot"><span class="annottext">getStatesWithInfo :: AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var hs-var">getStatesWithInfo</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679065038"><span class="annot"><span class="annottext">k :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065038"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; [State]
+forall k a. Map k a -&gt; [k]
+</span><span class="hs-identifier hs-var">Map.keys</span></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065038"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-125"></span><span>
+</span><span id="line-126"></span><span class="hs-comment">-- | This function returns the tags that a given state contains inside the AutomataInfo</span><span>
+</span><span id="line-127"></span><span class="hs-comment">--</span><span>
+</span><span id="line-128"></span><span id="local-6989586621679065131"><span class="annot"><a href="FSM.States.html#getTagsInState"><span class="hs-identifier hs-type">getTagsInState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065131"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-129"></span><span id="getTagsInState"><span class="annot"><span class="annottext">getTagsInState :: AutomataInfo a -&gt; State -&gt; [Tag]
+</span><a href="FSM.States.html#getTagsInState"><span class="hs-identifier hs-var hs-var">getTagsInState</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679065036"><span class="annot"><span class="annottext">k :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065036"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679065035"><span class="annot"><span class="annottext">n :: State
+</span><a href="#local-6989586621679065035"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-130"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065035"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065036"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Tag -&gt; [Tag]
+forall a. HasCallStack =&gt; Tag -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-string">&quot;This state does not contain info.&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-131"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a -&gt; [Tag]
+forall k a. Map k a -&gt; [k]
+</span><span class="hs-identifier hs-var">Map.keys</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+forall a. StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679065031"><span class="hs-identifier hs-var">state_map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-132"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679065031"><span class="annot"><span class="annottext">state_map :: StateInfo a
+</span><a href="#local-6989586621679065031"><span class="hs-identifier hs-var">state_map</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; Map State (StateInfo a) -&gt; Maybe (StateInfo a)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065035"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065036"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span class="hs-comment">-- | This function returns the information contained in the given state. If @Nothing@ is given, then it returns all the information in the state while if @Just tag@ is given, it will return only the information inside the given tag.</span><span>
+</span><span id="line-136"></span><span class="hs-comment">-- E.g:</span><span>
+</span><span id="line-137"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-138"></span><span class="hs-comment">-- &gt; getInfoInState my_info 4 Nothing</span><span>
+</span><span id="line-139"></span><span class="hs-comment">-- &gt; getInfoInState my_info 4 (Just &quot;foo&quot;)</span><span>
+</span><span id="line-140"></span><span class="hs-comment">--</span><span>
+</span><span id="line-141"></span><span id="local-6989586621679065121"><span class="annot"><a href="FSM.States.html#getInfoInState"><span class="hs-identifier hs-type">getInfoInState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065121"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type">StateInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065121"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-142"></span><span id="getInfoInState"><span class="annot"><span class="annottext">getInfoInState :: AutomataInfo a -&gt; State -&gt; Maybe Tag -&gt; StateInfo a
+</span><a href="FSM.States.html#getInfoInState"><span class="hs-identifier hs-var hs-var">getInfoInState</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679065029"><span class="annot"><span class="annottext">k :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065029"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679065028"><span class="annot"><span class="annottext">n :: State
+</span><a href="#local-6989586621679065028"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span>
+</span><span id="line-143"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065028"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065029"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a -&gt; StateInfo a
+forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-var">StateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+forall k a. Map k a
+</span><span class="hs-identifier hs-var">Map.empty</span></span><span>
+</span><span id="line-144"></span><span>        </span><span class="hs-comment">--error (&quot;This state does not contain info.&quot;)</span><span>
+</span><span id="line-145"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679065027"><span class="hs-identifier hs-var">state_map</span></a></span><span>
+</span><span id="line-146"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679065027"><span class="annot"><span class="annottext">state_map :: StateInfo a
+</span><a href="#local-6989586621679065027"><span class="hs-identifier hs-var">state_map</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; Map State (StateInfo a) -&gt; Maybe (StateInfo a)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065028"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065029"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-147"></span><span class="annot"><a href="FSM.States.html#getInfoInState"><span class="hs-identifier hs-var">getInfoInState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679065026"><span class="annot"><span class="annottext">k :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065026"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679065025"><span class="annot"><span class="annottext">n :: State
+</span><a href="#local-6989586621679065025"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679065024"><span class="annot"><span class="annottext">tag :: Tag
+</span><a href="#local-6989586621679065024"><span class="hs-identifier hs-var">tag</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-148"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065025"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065026"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a -&gt; StateInfo a
+forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-var">StateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+forall k a. Map k a
+</span><span class="hs-identifier hs-var">Map.empty</span></span><span>
+</span><span id="line-149"></span><span>       </span><span class="hs-comment">-- error (&quot;This state does not contain info.&quot;)</span><span>
+</span><span id="line-150"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tag -&gt; [Tag] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065024"><span class="hs-identifier hs-var">tag</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; State -&gt; [Tag]
+forall a. AutomataInfo a -&gt; State -&gt; [Tag]
+</span><a href="FSM.States.html#getTagsInState"><span class="hs-identifier hs-var">getTagsInState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065026"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065025"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a -&gt; StateInfo a
+forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-var">StateInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+forall k a. Map k a
+</span><span class="hs-identifier hs-var">Map.empty</span></span><span>
+</span><span id="line-151"></span><span>        </span><span class="hs-comment">--error (&quot;This state does not contain the given tag.&quot;)</span><span>
+</span><span id="line-152"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679065023"><span class="hs-identifier hs-var">output</span></a></span><span>
+</span><span id="line-153"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679065022"><span class="annot"><span class="annottext">state_map :: StateInfo a
+</span><a href="#local-6989586621679065022"><span class="hs-identifier hs-var">state_map</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; Map State (StateInfo a) -&gt; Maybe (StateInfo a)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065025"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065026"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-154"></span><span>          </span><span id="local-6989586621679065021"><span class="annot"><span class="annottext">tag_map :: Map Tag a
+</span><a href="#local-6989586621679065021"><span class="hs-identifier hs-var hs-var">tag_map</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+forall a. StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679065022"><span class="hs-identifier hs-var">state_map</span></a></span><span>
+</span><span id="line-155"></span><span>          </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679065020"><span class="annot"><span class="annottext">tag_info :: a
+</span><a href="#local-6989586621679065020"><span class="hs-identifier hs-var">tag_info</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; Map Tag a -&gt; Maybe a
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065024"><span class="hs-identifier hs-var">tag</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679065021"><span class="hs-identifier hs-var">tag_map</span></a></span><span>
+</span><span id="line-156"></span><span>          </span><span id="local-6989586621679065023"><span class="annot"><span class="annottext">output :: StateInfo a
+</span><a href="#local-6989586621679065023"><span class="hs-identifier hs-var hs-var">output</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo :: forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type hs-type">StateInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">tagMap :: Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var">tagMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; a -&gt; Map Tag a
+forall k a. k -&gt; a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.singleton</span></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065024"><span class="hs-identifier hs-var">tag</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679065020"><span class="hs-identifier hs-var">tag_info</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span class="hs-comment">-- Editing functions ---------------</span><span>
+</span><span id="line-159"></span><span>
+</span><span id="line-160"></span><span class="hs-comment">-- | This function takes a State, Maybe Tag, a value and an AutomataInfo object and updates the value of the Tag in the given State. Please note that if if Nothing is given, it will delete the State.</span><span>
+</span><span id="line-161"></span><span class="hs-comment">-- E.g:</span><span>
+</span><span id="line-162"></span><span class="hs-comment">--</span><span>
+</span><span id="line-163"></span><span class="hs-comment">-- &gt; alterStateInfo 3 (Just &quot;foo&quot;) (Type2 45) my_info</span><span>
+</span><span id="line-164"></span><span class="hs-comment">--</span><span>
+</span><span id="line-165"></span><span id="local-6989586621679065019"><span class="annot"><a href="FSM.States.html#alterStateInfo"><span class="hs-identifier hs-type">alterStateInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="FSM.States.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="FSM.States.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679065019"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065019"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065019"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-166"></span><span id="alterStateInfo"><span class="annot"><span class="annottext">alterStateInfo :: State -&gt; Maybe Tag -&gt; a -&gt; AutomataInfo a -&gt; AutomataInfo a
+</span><a href="FSM.States.html#alterStateInfo"><span class="hs-identifier hs-var hs-var">alterStateInfo</span></a></span></span><span> </span><span id="local-6989586621679065018"><span class="annot"><span class="annottext">state :: State
+</span><a href="#local-6989586621679065018"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nothing</span></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679065017"><span class="annot"><span class="annottext">info :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065017"><span class="hs-identifier hs-var">info</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-167"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065018"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065017"><span class="hs-identifier hs-var">info</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065017"><span class="hs-identifier hs-var">info</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-168"></span><span>        </span><span class="hs-comment">--error (&quot;This state does not contain info.&quot;)</span><span>
+</span><span id="line-169"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AutomataInfo :: forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type hs-type">AutomataInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">toMap :: Map State (StateInfo a)
+</span><a href="FSM.States.html#toMap"><span class="hs-identifier hs-var">toMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; Map State (StateInfo a) -&gt; Map State (StateInfo a)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.delete</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065018"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065017"><span class="hs-identifier hs-var">info</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-170"></span><span class="annot"><a href="FSM.States.html#alterStateInfo"><span class="hs-identifier hs-var">alterStateInfo</span></a></span><span> </span><span id="local-6989586621679065015"><span class="annot"><span class="annottext">state :: State
+</span><a href="#local-6989586621679065015"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679065014"><span class="annot"><span class="annottext">tag :: Tag
+</span><a href="#local-6989586621679065014"><span class="hs-identifier hs-var">tag</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679065013"><span class="annot"><span class="annottext">sinf :: a
+</span><a href="#local-6989586621679065013"><span class="hs-identifier hs-var">sinf</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679065012"><span class="annot"><span class="annottext">info :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065012"><span class="hs-identifier hs-var">info</span></a></span></span><span class="hs-special">)</span><span> </span><span>
+</span><span id="line-171"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065015"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065012"><span class="hs-identifier hs-var">info</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span>
+</span><span id="line-172"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679065011"><span class="annot"><span class="annottext">f :: p -&gt; Maybe a
+</span><a href="#local-6989586621679065011"><span class="hs-identifier hs-var hs-var">f</span></a></span></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679065013"><span class="hs-identifier hs-var">sinf</span></a></span><span>
+</span><span id="line-173"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679065010"><span class="annot"><span class="annottext">state_map :: StateInfo a
+</span><a href="#local-6989586621679065010"><span class="hs-identifier hs-var">state_map</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; Map State (StateInfo a) -&gt; Maybe (StateInfo a)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065015"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065012"><span class="hs-identifier hs-var">info</span></a></span><span>
+</span><span id="line-174"></span><span>            </span><span id="local-6989586621679065009"><span class="annot"><span class="annottext">tag_map :: Map Tag a
+</span><a href="#local-6989586621679065009"><span class="hs-identifier hs-var hs-var">tag_map</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+forall a. StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679065010"><span class="hs-identifier hs-var">state_map</span></a></span><span>
+</span><span id="line-175"></span><span>            </span><span id="local-6989586621679065008"><span class="annot"><span class="annottext">new_tag_map :: Map Tag a
+</span><a href="#local-6989586621679065008"><span class="hs-identifier hs-var hs-var">new_tag_map</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Maybe a -&gt; Maybe a) -&gt; Tag -&gt; Map Tag a -&gt; Map Tag a
+forall k a.
+Ord k =&gt;
+(Maybe a -&gt; Maybe a) -&gt; k -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.alter</span></span><span> </span><span class="annot"><span class="annottext">Maybe a -&gt; Maybe a
+forall p. p -&gt; Maybe a
+</span><a href="#local-6989586621679065011"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065014"><span class="hs-identifier hs-var">tag</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679065009"><span class="hs-identifier hs-var">tag_map</span></a></span><span>
+</span><span id="line-176"></span><span>            </span><span id="local-6989586621679065006"><span class="annot"><span class="annottext">g :: p -&gt; Maybe (StateInfo a)
+</span><a href="#local-6989586621679065006"><span class="hs-identifier hs-var hs-var">g</span></a></span></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a -&gt; Maybe (StateInfo a)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">StateInfo :: forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type hs-type">StateInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">tagMap :: Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var">tagMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679065008"><span class="hs-identifier hs-var">new_tag_map</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span>
+</span><span id="line-177"></span><span>            </span><span id="local-6989586621679065005"><span class="annot"><span class="annottext">new_state_map :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065005"><span class="hs-identifier hs-var hs-var">new_state_map</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Maybe (StateInfo a) -&gt; Maybe (StateInfo a))
+-&gt; State -&gt; Map State (StateInfo a) -&gt; Map State (StateInfo a)
+forall k a.
+Ord k =&gt;
+(Maybe a -&gt; Maybe a) -&gt; k -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.alter</span></span><span> </span><span class="annot"><span class="annottext">Maybe (StateInfo a) -&gt; Maybe (StateInfo a)
+forall p. p -&gt; Maybe (StateInfo a)
+</span><a href="#local-6989586621679065006"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065015"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065012"><span class="hs-identifier hs-var">info</span></a></span><span>
+</span><span id="line-178"></span><span>        </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">AutomataInfo :: forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type hs-type">AutomataInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">toMap :: Map State (StateInfo a)
+</span><a href="FSM.States.html#toMap"><span class="hs-identifier hs-var">toMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065005"><span class="hs-identifier hs-var">new_state_map</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-179"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span>
+</span><span id="line-180"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679065004"><span class="annot"><span class="annottext">new_tag_map :: StateInfo a
+</span><a href="#local-6989586621679065004"><span class="hs-identifier hs-var hs-var">new_tag_map</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo :: forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type hs-type">StateInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">tagMap :: Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var">tagMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; a -&gt; Map Tag a
+forall k a. k -&gt; a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.singleton</span></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679065014"><span class="hs-identifier hs-var">tag</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679065013"><span class="hs-identifier hs-var">sinf</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-181"></span><span>            </span><span id="local-6989586621679065003"><span class="annot"><span class="annottext">g :: p -&gt; Maybe (StateInfo a)
+</span><a href="#local-6989586621679065003"><span class="hs-identifier hs-var hs-var">g</span></a></span></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a -&gt; Maybe (StateInfo a)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679065004"><span class="hs-identifier hs-var">new_tag_map</span></a></span><span>
+</span><span id="line-182"></span><span>            </span><span id="local-6989586621679065002"><span class="annot"><span class="annottext">new_state_map :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065002"><span class="hs-identifier hs-var hs-var">new_state_map</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Maybe (StateInfo a) -&gt; Maybe (StateInfo a))
+-&gt; State -&gt; Map State (StateInfo a) -&gt; Map State (StateInfo a)
+forall k a.
+Ord k =&gt;
+(Maybe a -&gt; Maybe a) -&gt; k -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.alter</span></span><span> </span><span class="annot"><span class="annottext">Maybe (StateInfo a) -&gt; Maybe (StateInfo a)
+forall p. p -&gt; Maybe (StateInfo a)
+</span><a href="#local-6989586621679065003"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679065015"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065012"><span class="hs-identifier hs-var">info</span></a></span><span>
+</span><span id="line-183"></span><span>        </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">AutomataInfo :: forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type hs-type">AutomataInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">toMap :: Map State (StateInfo a)
+</span><a href="FSM.States.html#toMap"><span class="hs-identifier hs-var">toMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679065002"><span class="hs-identifier hs-var">new_state_map</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-184"></span><span>
+</span><span id="line-185"></span><span class="hs-comment">{-
+emptyState :: State -&gt; AutomataInfo a
+emptyState state = AutomataInfo {toMap = Map.singleton state output}
+        where output = StateInfo {tagMap = Map.empty}-}</span><span>
+</span><span id="line-189"></span><span>
+</span><span id="line-190"></span><span class="hs-comment">-- unionStateAux :: AutomataInfo a -&gt; AutomataInfo a -&gt; AutomataInfo a -&gt; [State] -&gt; AutomataInfo a</span><span>
+</span><span id="line-191"></span><span class="hs-comment">-- unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo output) [l] </span><span>
+</span><span id="line-192"></span><span class="hs-comment">--     | (elem l (getStatesWithInfo (AutomataInfo info1))) &amp;&amp; (not (elem l (getStatesWithInfo (AutomataInfo info2)))) = (AutomataInfo output)</span><span>
+</span><span id="line-193"></span><span class="hs-comment">--     | (not (elem l (getStatesWithInfo (AutomataInfo info1)))) &amp;&amp; (elem l (getStatesWithInfo (AutomataInfo info2))) = </span><span>
+</span><span id="line-194"></span><span class="hs-comment">--         let tag_map2 = tagMap (getInfoInState (AutomataInfo info2) l Nothing)</span><span>
+</span><span id="line-195"></span><span class="hs-comment">--             tag_output = StateInfo {tagMap = tag_map2}</span><span>
+</span><span id="line-196"></span><span class="hs-comment">--             state_output = Map.singleton l tag_output</span><span>
+</span><span id="line-197"></span><span class="hs-comment">--         in (AutomataInfo (Map.union state_output output))</span><span>
+</span><span id="line-198"></span><span class="hs-comment">--     | otherwise = </span><span>
+</span><span id="line-199"></span><span class="hs-comment">--         let tag_map1 = tagMap (getInfoInState (AutomataInfo info1) l Nothing)</span><span>
+</span><span id="line-200"></span><span class="hs-comment">--             tag_map2 = tagMap (getInfoInState (AutomataInfo info2) l Nothing)</span><span>
+</span><span id="line-201"></span><span class="hs-comment">--             tag_output = StateInfo {tagMap = Map.union tag_map1 tag_map2}</span><span>
+</span><span id="line-202"></span><span class="hs-comment">--             state_output = Map.singleton l tag_output</span><span>
+</span><span id="line-203"></span><span class="hs-comment">--         in (AutomataInfo (Map.union state_output output))</span><span>
+</span><span id="line-204"></span><span id="unionStateAux"><span class="annot"><span class="annottext">unionStateAux :: AutomataInfo a
+-&gt; AutomataInfo a -&gt; AutomataInfo a -&gt; [State] -&gt; AutomataInfo a
+</span><a href="FSM.States.html#unionStateAux"><span class="hs-identifier hs-var hs-var">unionStateAux</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679065000"><span class="annot"><span class="annottext">info1 :: Map State (StateInfo a)
+</span><a href="#local-6989586621679065000"><span class="hs-identifier hs-var">info1</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679064999"><span class="annot"><span class="annottext">info2 :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064999"><span class="hs-identifier hs-var">info2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679064998"><span class="annot"><span class="annottext">output :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064998"><span class="hs-identifier hs-var">output</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064998"><span class="hs-identifier hs-var">output</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-205"></span><span class="annot"><a href="FSM.States.html#unionStateAux"><span class="hs-identifier hs-var">unionStateAux</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679064997"><span class="annot"><span class="annottext">info1 :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064997"><span class="hs-identifier hs-var">info1</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679064996"><span class="annot"><span class="annottext">info2 :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064996"><span class="hs-identifier hs-var">info2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679064995"><span class="annot"><span class="annottext">output :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064995"><span class="hs-identifier hs-var">output</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679064994"><span class="annot"><span class="annottext">l :: State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679064993"><span class="annot"><span class="annottext">ls :: [State]
+</span><a href="#local-6989586621679064993"><span class="hs-identifier hs-var">ls</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-206"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064997"><span class="hs-identifier hs-var">info1</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064996"><span class="hs-identifier hs-var">info2</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+-&gt; AutomataInfo a -&gt; AutomataInfo a -&gt; [State] -&gt; AutomataInfo a
+</span><a href="FSM.States.html#unionStateAux"><span class="hs-identifier hs-var">unionStateAux</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064997"><span class="hs-identifier hs-var">info1</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064996"><span class="hs-identifier hs-var">info2</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064995"><span class="hs-identifier hs-var">output</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[State]
+</span><a href="#local-6989586621679064993"><span class="hs-identifier hs-var">ls</span></a></span><span>
+</span><span id="line-207"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064997"><span class="hs-identifier hs-var">info1</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State -&gt; [State] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; [State]
+forall a. AutomataInfo a -&gt; [State]
+</span><a href="FSM.States.html#getStatesWithInfo"><span class="hs-identifier hs-var">getStatesWithInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064996"><span class="hs-identifier hs-var">info2</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span>
+</span><span id="line-208"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679064991"><span class="annot"><span class="annottext">tag_map2 :: Map Tag a
+</span><a href="#local-6989586621679064991"><span class="hs-identifier hs-var hs-var">tag_map2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+forall a. StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; State -&gt; Maybe Tag -&gt; StateInfo a
+forall a. AutomataInfo a -&gt; State -&gt; Maybe Tag -&gt; StateInfo a
+</span><a href="FSM.States.html#getInfoInState"><span class="hs-identifier hs-var">getInfoInState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064996"><span class="hs-identifier hs-var">info2</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Tag
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-209"></span><span>            </span><span id="local-6989586621679064990"><span class="annot"><span class="annottext">tag_output :: StateInfo a
+</span><a href="#local-6989586621679064990"><span class="hs-identifier hs-var hs-var">tag_output</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo :: forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type hs-type">StateInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">tagMap :: Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var">tagMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679064991"><span class="hs-identifier hs-var">tag_map2</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-210"></span><span>            </span><span id="local-6989586621679064989"><span class="annot"><span class="annottext">state_output :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064989"><span class="hs-identifier hs-var hs-var">state_output</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; StateInfo a -&gt; Map State (StateInfo a)
+forall k a. k -&gt; a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.singleton</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679064990"><span class="hs-identifier hs-var">tag_output</span></a></span><span>
+</span><span id="line-211"></span><span>        </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+-&gt; AutomataInfo a -&gt; AutomataInfo a -&gt; [State] -&gt; AutomataInfo a
+</span><a href="FSM.States.html#unionStateAux"><span class="hs-identifier hs-var">unionStateAux</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064997"><span class="hs-identifier hs-var">info1</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064996"><span class="hs-identifier hs-var">info2</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a)
+-&gt; Map State (StateInfo a) -&gt; Map State (StateInfo a)
+forall k a. Ord k =&gt; Map k a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.union</span></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064989"><span class="hs-identifier hs-var">state_output</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064995"><span class="hs-identifier hs-var">output</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[State]
+</span><a href="#local-6989586621679064993"><span class="hs-identifier hs-var">ls</span></a></span><span>
+</span><span id="line-212"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span>
+</span><span id="line-213"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679064987"><span class="annot"><span class="annottext">tag_map1 :: Map Tag a
+</span><a href="#local-6989586621679064987"><span class="hs-identifier hs-var hs-var">tag_map1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+forall a. StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; State -&gt; Maybe Tag -&gt; StateInfo a
+forall a. AutomataInfo a -&gt; State -&gt; Maybe Tag -&gt; StateInfo a
+</span><a href="FSM.States.html#getInfoInState"><span class="hs-identifier hs-var">getInfoInState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064997"><span class="hs-identifier hs-var">info1</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Tag
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-214"></span><span>            </span><span id="local-6989586621679064986"><span class="annot"><span class="annottext">tag_map2 :: Map Tag a
+</span><a href="#local-6989586621679064986"><span class="hs-identifier hs-var hs-var">tag_map2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo a -&gt; Map Tag a
+forall a. StateInfo a -&gt; Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var hs-var">tagMap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AutomataInfo a -&gt; State -&gt; Maybe Tag -&gt; StateInfo a
+forall a. AutomataInfo a -&gt; State -&gt; Maybe Tag -&gt; StateInfo a
+</span><a href="FSM.States.html#getInfoInState"><span class="hs-identifier hs-var">getInfoInState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064996"><span class="hs-identifier hs-var">info2</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Tag
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-215"></span><span>            </span><span id="local-6989586621679064985"><span class="annot"><span class="annottext">tag_output :: StateInfo a
+</span><a href="#local-6989586621679064985"><span class="hs-identifier hs-var hs-var">tag_output</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateInfo :: forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type hs-type">StateInfo</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">tagMap :: Map Tag a
+</span><a href="FSM.States.html#tagMap"><span class="hs-identifier hs-var">tagMap</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tag a -&gt; Map Tag a -&gt; Map Tag a
+forall k a. Ord k =&gt; Map k a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.union</span></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679064987"><span class="hs-identifier hs-var">tag_map1</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679064986"><span class="hs-identifier hs-var">tag_map2</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-216"></span><span>            </span><span id="local-6989586621679064984"><span class="annot"><span class="annottext">state_output :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064984"><span class="hs-identifier hs-var hs-var">state_output</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State -&gt; StateInfo a -&gt; Map State (StateInfo a)
+forall k a. k -&gt; a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.singleton</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="#local-6989586621679064994"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">StateInfo a
+</span><a href="#local-6989586621679064985"><span class="hs-identifier hs-var">tag_output</span></a></span><span>
+</span><span id="line-217"></span><span>        </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">AutomataInfo a
+-&gt; AutomataInfo a -&gt; AutomataInfo a -&gt; [State] -&gt; AutomataInfo a
+</span><a href="FSM.States.html#unionStateAux"><span class="hs-identifier hs-var">unionStateAux</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064997"><span class="hs-identifier hs-var">info1</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064996"><span class="hs-identifier hs-var">info2</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map State (StateInfo a)
+-&gt; Map State (StateInfo a) -&gt; Map State (StateInfo a)
+forall k a. Ord k =&gt; Map k a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.union</span></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064984"><span class="hs-identifier hs-var">state_output</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064995"><span class="hs-identifier hs-var">output</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[State]
+</span><a href="#local-6989586621679064993"><span class="hs-identifier hs-var">ls</span></a></span><span>
+</span><span id="line-218"></span><span>            </span><span>
+</span><span id="line-219"></span><span class="hs-comment">-- | This function takes the left-biased union of t1 and t2. It prefers t1 when duplicate keys are encountered. Works similarly to &lt;http://hackage.haskell.org/package/containers-0.6.2.1/docs/Data-Map-Strict.html#g:12 Data.Map.union&gt;.</span><span>
+</span><span id="line-220"></span><span class="hs-comment">--</span><span>
+</span><span id="line-221"></span><span class="hs-comment">{-unionStateInfo :: AutomataInfo a -&gt; AutomataInfo a -&gt; AutomataInfo a
+unionStateInfo (AutomataInfo info1) (AutomataInfo info2) = unionStateAux (AutomataInfo info1) (AutomataInfo info2) (AutomataInfo info1) ls
+    where ls = L.union (getStatesWithInfo (AutomataInfo info1)) (getStatesWithInfo (AutomataInfo info2))-}</span><span> </span><span>
+</span><span id="line-224"></span><span>          </span><span>
+</span><span id="line-225"></span><span id="local-6989586621679065146"><span class="annot"><a href="FSM.States.html#unionStateInfo"><span class="hs-identifier hs-type">unionStateInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065146"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065146"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679065146"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-226"></span><span id="unionStateInfo"><span class="annot"><span class="annottext">unionStateInfo :: AutomataInfo a -&gt; AutomataInfo a -&gt; AutomataInfo a
+</span><a href="FSM.States.html#unionStateInfo"><span class="hs-identifier hs-var hs-var">unionStateInfo</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679064983"><span class="annot"><span class="annottext">info1 :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064983"><span class="hs-identifier hs-var">info1</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-type">AutomataInfo</span></a></span><span> </span><span id="local-6989586621679064982"><span class="annot"><span class="annottext">info2 :: Map State (StateInfo a)
+</span><a href="#local-6989586621679064982"><span class="hs-identifier hs-var">info2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-227"></span><span>  </span><span class="annot"><span class="annottext">Map State (StateInfo a) -&gt; AutomataInfo a
+forall a. Map State (StateInfo a) -&gt; AutomataInfo a
+</span><a href="FSM.States.html#AutomataInfo"><span class="hs-identifier hs-var">AutomataInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(StateInfo a -&gt; StateInfo a -&gt; StateInfo a)
+-&gt; Map State (StateInfo a)
+-&gt; Map State (StateInfo a)
+-&gt; Map State (StateInfo a)
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; Map k a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.unionWith</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type">StateInfo</span></a></span><span> </span><span id="local-6989586621679064980"><span class="annot"><span class="annottext">sti1 :: Map Tag a
+</span><a href="#local-6989586621679064980"><span class="hs-identifier hs-var">sti1</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-type">StateInfo</span></a></span><span> </span><span id="local-6989586621679064979"><span class="annot"><span class="annottext">sti2 :: Map Tag a
+</span><a href="#local-6989586621679064979"><span class="hs-identifier hs-var">sti2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-228"></span><span>                                 </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Tag a -&gt; StateInfo a
+forall a. Map Tag a -&gt; StateInfo a
+</span><a href="FSM.States.html#StateInfo"><span class="hs-identifier hs-var">StateInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Tag a -&gt; Map Tag a -&gt; Map Tag a
+forall k a. Ord k =&gt; Map k a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.union</span></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679064980"><span class="hs-identifier hs-var">sti1</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tag a
+</span><a href="#local-6989586621679064979"><span class="hs-identifier hs-var">sti2</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-229"></span><span>                </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064983"><span class="hs-identifier hs-var">info1</span></a></span><span> </span><span class="annot"><span class="annottext">Map State (StateInfo a)
+</span><a href="#local-6989586621679064982"><span class="hs-identifier hs-var">info2</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-230"></span></pre></body></html>

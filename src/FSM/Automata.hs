@@ -355,6 +355,7 @@ changeInitialState t s0'
 --               m = getAssociations t 
     
 -- | This function adds one accepting state
+--
 addAcceptingState :: Automata -> Int -> Automata
 addAcceptingState t a0
     | not (elem a0 (getStates t)) = error ( "This state is not one of the states of the automata." )
